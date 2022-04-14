@@ -21,7 +21,7 @@ let set = new Set();
 let activeUsers = [];
 let nameMap = new Map();
 
-let socket = io("ws://ksu-project-be.herokuapp.com/socket.io/?EIO=4&transport=websocket");
+let socket = io(window.location.hostname);
 
 export function EmpChat(props){
 

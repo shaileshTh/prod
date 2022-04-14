@@ -22,6 +22,7 @@ let activeUsers = [];
 let nameMap = new Map();
 
 let socket = io();
+console.log(socket)
 
 export function EmpChat(props){
 

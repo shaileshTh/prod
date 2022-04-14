@@ -21,7 +21,7 @@ let set = new Set();
 let activeUsers = [];
 let nameMap = new Map();
 
-let socket = io.connect(window.location.hostname);
+let socket = io();
 
 export function Chat(props){
 

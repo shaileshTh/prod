@@ -21,7 +21,7 @@ let set = new Set();
 let activeUsers = [];
 let nameMap = new Map();
 
-let socket = io.connect('https://prod-five.vercel.app/socket.io/?EIO=4&transport=polling');
+let socket = io();
 
 export function EmpChat(props){
 

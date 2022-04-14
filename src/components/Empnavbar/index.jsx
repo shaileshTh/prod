@@ -70,7 +70,7 @@ export function EmpNavBar(props) {
                 axios
                   .get("https://ksu-project-be.herokuapp.com/logout")
                   .then((response) => {
-                    if (response.statusText === "OK") {
+                    if (response.statusText === "logged out") {
                       history.replace("/");
                     }
                   })

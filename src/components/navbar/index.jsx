@@ -35,7 +35,7 @@ export function NavBar(props){
                 <button style = {{border: 'none', background: 'none'}} onClick = {()=>{
                   axios.get('https://ksu-project-be.herokuapp.com/logout')
                   .then((response) => {
-                    if(response.statusText === "OK"){
+                    if(response.statusText === "logged out"){
                       history.replace("/");
                     }
                   }).catch((err) => {

@@ -21,7 +21,7 @@ let set = new Set();
 let activeUsers = [];
 let nameMap = new Map();
 
-let socket = io("ws://localhost:4000", { transports : ['websocket'] });
+let socket = io(window.location.hostname);
 
 export function Chat(props){
 

@@ -33,7 +33,7 @@ export function NavBar(props){
             </Navbar.Text>{'|'}
             <Navbar.Text style = {{marginLeft: '7px'}}>
                 <button style = {{border: 'none', background: 'none'}} onClick = {()=>{
-                  axios.post('https://ksu-project-be.herokuapp.com/logout')
+                  axios.get('https://ksu-project-be.herokuapp.com/logout')
                   .then((response) => {
                     if(response.statusText === "OK"){
                       history.replace("/");

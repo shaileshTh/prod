@@ -13,7 +13,8 @@ import Collapse from 'react-bootstrap/Collapse'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Badge from 'react-bootstrap/Badge'
 import { NavBar } from "../../components/navbar";
-import { getDatabase, ref, onValue, set } from "firebase/database";
+import database from '../../Firebase'
+import { ref, onValue, set } from "firebase/database";
 
 // import { io } from "socket.io-client";
 // const EventSource = require('eventsource')
@@ -26,7 +27,7 @@ let messageArr = [];
 let setS = new Set();
 let activeUsers = [];
 let nameMap = new Map();
-const db = getDatabase();
+const db = database;
 
 // let socket = io();
 // es.addEventListener('new-message', function(message){

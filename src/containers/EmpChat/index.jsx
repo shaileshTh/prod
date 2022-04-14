@@ -14,8 +14,8 @@ import ScrollableFeed from 'react-scrollable-feed'
 import Collapse from 'react-bootstrap/Collapse'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Badge from 'react-bootstrap/Badge'
-import app from '../../Firebase'
-import { getDatabase, ref, onValue, set } from "firebase/database";
+import database from '../../Firebase'
+import { ref, onValue, set } from "firebase/database";
 
 
 let index
@@ -23,7 +23,7 @@ let messageArr = [];
 let setS = new Set();
 let activeUsers = [];
 let nameMap = new Map();
-const db = getDatabase();
+const db = database;
 
 // let socket = io();
 // console.log(socket)

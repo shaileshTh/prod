@@ -39,7 +39,7 @@ export function Documents(props) {
     useEffect(() => {
         axios.defaults.withCredentials = true;
 
-        axios.post('http://localhost:3001/me', { withCredentials: true })
+        axios.post('https://ksu-project-be.herokuapp.com/me', { withCredentials: true })
             .then((response) => {
                 setEmail(response.data.full_name)
                 setID(parseInt(response.data.user_id));
@@ -49,7 +49,7 @@ export function Documents(props) {
             })
 
 
-        axios.get(`http://localhost:3001/documents/${user_id}`, { withCredentials: true })
+        axios.get(`https://ksu-project-be.herokuapp.com/documents/${user_id}`, { withCredentials: true })
             .then((response) => {
                 setReports(response.data)
     

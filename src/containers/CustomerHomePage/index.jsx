@@ -17,7 +17,7 @@ export function CustomerHomePage(props) {
 	useEffect(() => {
 		axios.defaults.withCredentials = true;
 
-		axios.post('http://localhost:3001/me', { withCredentials: true })
+		axios.post('https://ksu-project-be.herokuapp.com/me', { withCredentials: true })
 			.then((response) => {
 				console.log("This is response:", response.data)
 				setEmail(response.data.full_name)

@@ -17,7 +17,7 @@ export function NurseAppointments(props) {
     axios.defaults.withCredentials = true;
 
     axios
-      .post("http://localhost:3001/me", { withCredentials: true })
+      .post("https://ksu-project-be.herokuapp.com/me", { withCredentials: true })
       .then((response) => {
         console.log("Nurse appt page me: ", response.data);
         setEmail(response.data.full_name);
@@ -58,7 +58,7 @@ export function NurseAppointments(props) {
       return;
     }
     axios
-      .post("http://localhost:3001/doctorAppTime/mostRecent", {
+      .post("https://ksu-project-be.herokuapp.com/doctorAppTime/mostRecent", {
         doctorID: selectedDoctorID,
       })
       .then((response) => {
@@ -84,7 +84,7 @@ export function NurseAppointments(props) {
       alert("No Timeslot Selected.");
     } else {
       axios
-        .post("http://localhost:3001/doctorAppTime/setAvailability", {
+        .post("https://ksu-project-be.herokuapp.com/doctorAppTime/setAvailability", {
           avaiableSchedule: schedule,
           id: selectedDoctorID,
         })
@@ -105,7 +105,7 @@ export function NurseAppointments(props) {
    */
   const getNewestAvailability = () => {
     axios
-      .post("http://localhost:3001/doctorAppTime/mostRecent", {
+      .post("https://ksu-project-be.herokuapp.com/doctorAppTime/mostRecent", {
         doctorID: selectedDoctorID,
       })
       .then((response) => {
@@ -156,7 +156,7 @@ export function NurseAppointments(props) {
     apptActionApptID = e.split(" ")[1];
 
     axios
-    .put(`http://localhost:3001/appointment/nurseUpdateAppt/${apptActionApptID}`, {
+    .put(`https://ksu-project-be.herokuapp.com/appointment/nurseUpdateAppt/${apptActionApptID}`, {
       action: e.split(" ")[0],
     })
     .then((response) => {
@@ -178,7 +178,7 @@ export function NurseAppointments(props) {
     
     if(apptActionApptID){
       axios
-      .delete(`http://localhost:3001/appointment/deleteAppt/${apptActionApptID}`)
+      .delete(`https://ksu-project-be.herokuapp.com/appointment/deleteAppt/${apptActionApptID}`)
       .then((response) => {
         reEnableDoctorSchedule(response.data[0]);
         alert(`Appointment ID: ${response.data[0].appt_id} ${text} Successful`);
@@ -201,7 +201,7 @@ export function NurseAppointments(props) {
     const reEnableTime = new Date(`${formatedTime}`);
 
     axios
-        .put("http://localhost:3001/doctorAppTime/reEnableAvailability", {
+        .put("https://ksu-project-be.herokuapp.com/doctorAppTime/reEnableAvailability", {
           newSchedule: reEnableTime,
           id: doctorID,
         })

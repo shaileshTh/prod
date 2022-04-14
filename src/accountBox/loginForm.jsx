@@ -6,7 +6,7 @@ import { useHistory } from "react-router-dom";
 import Alert from 'react-bootstrap/Alert'
 import { Link} from "react-router-dom";
 import axios from "axios";
-// axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true;
 
 export function LoginForm(props){
 
@@ -19,14 +19,14 @@ export function LoginForm(props){
     
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:3001/login', {
+        axios.post('https://ksu-project-be.herokuapp.com/login', {
             email : email,
             password: password
           },{
             headers: {
               'Content-Type': 'application/json'
             },
-            withCredentials: true
+            withCredentials: true,
           })
           .then(function (response) {
               console.log("login page response is:", response.data)

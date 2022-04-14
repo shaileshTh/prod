@@ -51,7 +51,7 @@ export function Chat(props){
         axios.defaults.withCredentials = true;
 
         axios
-        .get("http://localhost:3001/all-users")
+        .get("https://ksu-project-be.herokuapp.com/all-users")
         .then((response) =>{
             let arr = [];
             response.data.forEach((element) => {
@@ -73,7 +73,7 @@ export function Chat(props){
         axios.defaults.withCredentials = true;
 
         axios
-        .post("http://localhost:3001/me", { withCredentials: true })
+        .post("https://ksu-project-be.herokuapp.com/me", { withCredentials: true})
         .then((response) => {
             setEmail(response.data.email);
             setUserID(response.data.user_id);
@@ -85,7 +85,7 @@ export function Chat(props){
     }, [userID])
     useEffect(()=>{
         axios
-            .get("http://localhost:3001/messaging")
+            .get("https://ksu-project-be.herokuapp.com/messaging")
             .then((response) =>{
                 messageArr = response.data.filter((item) => {
                     return item.recipient_id === userID || item.sender_id === userID
@@ -105,7 +105,7 @@ export function Chat(props){
                 setAllMessages(messageArr)
                 activeUsers.forEach((id) => {
                     axios
-                    .get(`http://localhost:3001/user/find/${id}`, { withCredentials: true },
+                    .get(`https://ksu-project-be.herokuapp.com/user/find/${id}`, { withCredentials: true },
                     { }).then((response) => {
                         nameMap.set(id, response.data[0].full_name)
                         if(nameMap.size === activeUsers.length) setMapDone(true)
@@ -135,7 +135,7 @@ export function Chat(props){
     const handleModalSubmit = (e) =>{
         e.preventDefault();
        axios
-        .post("http://localhost:3001/messaging", 
+        .post("https://ksu-project-be.herokuapp.com/messaging", 
         { 
             sender_id: userID,
             recipient_id: userList[composeTo].user_id,
@@ -147,7 +147,7 @@ export function Chat(props){
         e.preventDefault();
         setFetched(false);
         axios
-        .post("http://localhost:3001/messaging", 
+        .post("https://ksu-project-be.herokuapp.com/messaging", 
         { 
             sender_id: userID,
             recipient_id: e.target.parentElement.id,

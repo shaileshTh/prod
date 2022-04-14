@@ -19,7 +19,7 @@ export function EmpAppointments(props) {
     axios.defaults.withCredentials = true;
 
     axios
-      .post("http://localhost:3001/me", { withCredentials: true })
+      .post("https://ksu-project-be.herokuapp.com/me", { withCredentials: true })
       .then((response) => {
         console.log("Doctor appt page me: ", response.data);
         setEmail(response.data.full_name);

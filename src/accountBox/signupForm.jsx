@@ -17,8 +17,10 @@ export function SignUpForm(props){
     const history = useHistory();
 
     const handleSubmit = (e) => {
+    axios.defaults.withCredentials = true;
+
         e.preventDefault();
-        axios.post('http://localhost:3001/register', {
+        axios.post('https://ksu-project-be.herokuapp.com/register', {
             full_name: name,
             email : email,
             password: password,

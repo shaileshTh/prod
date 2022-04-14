@@ -14,8 +14,8 @@ import ListGroup from 'react-bootstrap/ListGroup'
 import Badge from 'react-bootstrap/Badge'
 import { NavBar } from "../../components/navbar";
 // import { io } from "socket.io-client";
-const EventSource = require('eventsource')
-const es = new EventSource('https:///ksu-project-be.herokuapp.com/sse')
+// const EventSource = require('eventsource')
+// const es = new EventSource('https:///ksu-project-be.herokuapp.com/sse')
 
 
 let index
@@ -25,9 +25,9 @@ let activeUsers = [];
 let nameMap = new Map();
 
 // let socket = io();
-es.addEventListener('new-message', function(message){
-    console.log(message)
-})
+// es.addEventListener('new-message', function(message){
+//     console.log(message)
+// })
 
 export function Chat(props){
 

@@ -9,21 +9,28 @@ import Button from 'react-bootstrap/Button'
 import axios from 'axios';
 import { useState, useEffect } from "react";
 import { EmpNavBar } from "../../components/Empnavbar";
-import { io } from "socket.io-client";
+// import { io } from "socket.io-client";
 import ScrollableFeed from 'react-scrollable-feed'
 import Collapse from 'react-bootstrap/Collapse'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Badge from 'react-bootstrap/Badge'
+import app from '../../Firebase'
+import { getDatabase, ref, onValue, set } from "firebase/database";
+
 
 let index
 let messageArr = [];
-let set = new Set();
+let setS = new Set();
 let activeUsers = [];
 let nameMap = new Map();
+const db = getDatabase();
 
-let socket = io();
-console.log(socket)
-
+// let socket = io();
+// console.log(socket)
+onValue(ref(db, 'messages/'), (snapshot) => {
+    console.log(snapshot)
+});
+    
 export function EmpChat(props){
 
     const [fetched, setFetched] = useState(false);
@@ -38,14 +45,14 @@ export function EmpChat(props){
     const[composeTo, setComposeTo] = useState();
     const [open, setOpen] = useState(false);
 
-    useEffect(() => {
-        socket.once("new", (arg) => {
-            socket.off()
-            console.log(arg)
-            setFetched(false)
-            return false;
-        })
-    },[fetched])
+    // useEffect(() => {
+    //     socket.once("new", (arg) => {
+    //         socket.off()
+    //         console.log(arg)
+    //         setFetched(false)
+    //         return false;
+    //     })
+    // },[fetched])
    
     useEffect(() => {
         axios.defaults.withCredentials = true;
@@ -54,7 +61,7 @@ export function EmpChat(props){
         .then((response) =>{
             let arr = [];
             response.data.forEach((element) => {
-                if(!set.has(element.user_id)){
+                if(!setS.has(element.user_id)){
                     arr.push({
                         user_id : element.user_id,
                         full_name: element.full_name,
@@ -90,13 +97,13 @@ export function EmpChat(props){
 
             }).then(() => {
                 messageArr.forEach((item) => {
-                    if(!set.has(item.sender_id) && item.sender_id !== userID){
+                    if(!setS.has(item.sender_id) && item.sender_id !== userID){
                         activeUsers.push(item.sender_id)
-                        set.add(item.sender_id)
+                        setS.add(item.sender_id)
                     }
-                    if(!set.has(item.recipient_id) && item.recipient_id !== userID){
+                    if(!setS.has(item.recipient_id) && item.recipient_id !== userID){
                         activeUsers.push(item.recipient_id)
-                        set.add(item.recipient_id)
+                        setS.add(item.recipient_id)
                     }
                 })
                 setAllMessages(messageArr)
@@ -131,6 +138,10 @@ export function EmpChat(props){
 
     const handleModalSubmit = (e) =>{
         e.preventDefault();
+        set(ref(db, 'messages/'), {
+            message: e.target[0].value
+        });
+      
        axios
         .post("https://ksu-project-be.herokuapp.com/messaging", 
         { 
@@ -142,6 +153,9 @@ export function EmpChat(props){
     }
     const handleSubmit = (e) =>{
         e.preventDefault();
+        set(ref(db, 'messages/'), {
+            message: e.target[0].value
+        });
         setFetched(false);
         axios
         .post("https://ksu-project-be.herokuapp.com/messaging", 

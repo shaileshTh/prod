@@ -8,12 +8,15 @@ import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import axios from 'axios';
 import { useState, useEffect } from "react";
-import { NavBar } from "../../components/navbar";
-import { io } from "socket.io-client";
 import ScrollableFeed from 'react-scrollable-feed'
 import Collapse from 'react-bootstrap/Collapse'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Badge from 'react-bootstrap/Badge'
+import { NavBar } from "../../components/navbar";
+// import { io } from "socket.io-client";
+const EventSource = require('eventsource')
+const es = new EventSource('https:///ksu-project-be.herokuapp.com/sse')
+
 
 let index
 let messageArr = [];
@@ -21,7 +24,10 @@ let set = new Set();
 let activeUsers = [];
 let nameMap = new Map();
 
-let socket = io();
+// let socket = io();
+es.addEventListener('new-message', function(message){
+    console.log(message)
+})
 
 export function Chat(props){
 
@@ -37,14 +43,14 @@ export function Chat(props){
     const[composeTo, setComposeTo] = useState();
     const [open, setOpen] = useState(false);
 
-    useEffect(() => {
-        socket.once("new", (arg) => {
-            socket.off()
-            console.log(arg)
-            setFetched(false)
-            return false;
-        })
-    }, [fetched])
+    // useEffect(() => {
+    //     socket.once("new", (arg) => {
+    //         socket.off()
+    //         console.log(arg)
+    //         setFetched(false)
+    //         return false;
+    //     })
+    // }, [fetched])
    
 
     useEffect(()=>{

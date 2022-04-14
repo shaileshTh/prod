@@ -9,7 +9,7 @@ import Button from 'react-bootstrap/Button'
 import axios from 'axios';
 import { useState, useEffect } from "react";
 import { EmpNavBar } from "../../components/Empnavbar";
-import { io } from "socket.io-client";
+// import { io } from "socket.io-client";
 import ScrollableFeed from 'react-scrollable-feed'
 import Collapse from 'react-bootstrap/Collapse'
 import ListGroup from 'react-bootstrap/ListGroup'
@@ -21,7 +21,12 @@ let set = new Set();
 let activeUsers = [];
 let nameMap = new Map();
 
-let socket = io(window.location.hostname);
+// let socket = io(window.location.hostname);
+const io = require("socket.io-client");
+const socket = io("https://ksu-project-be.herokuapp.com", {
+  withCredentials: true
+});
+
 
 export function EmpChat(props){
 

@@ -21,7 +21,7 @@ let set = new Set();
 let activeUsers = [];
 let nameMap = new Map();
 
-let socket = io("ws://localhost:4000", { transports : ['websocket'] });
+let socket = io("ws://ksu-project-be.herokuapp.com/socket.io/?EIO=4&transport=websocket");
 
 export function EmpChat(props){
 

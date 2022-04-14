@@ -163,13 +163,15 @@ export function Chat(props){
             message: e.target[0].value
          }).then(e.target[0].value = "").then(setShow(false))
          .catch(err => console.log(err))
+         setTimeout(()=>setFetched(false), 100)
+
     }
     const handleSubmit = (e) =>{
         e.preventDefault();
         set(ref(db, 'messages/'), {
             message: e.target[0].value
         });
-        setFetched(false);
+        // setFetched(false);
         axios
         .post("https://ksu-project-be.herokuapp.com/messaging", 
         { 
@@ -178,6 +180,8 @@ export function Chat(props){
             message: e.target[0].value
          }).then(e.target[0].value = "")
          .catch(err => console.log(err))
+         setTimeout(()=>setFetched(false), 100)
+
     }
     if(loading && !mapDone) return <h1>loading</h1>
     index = -1

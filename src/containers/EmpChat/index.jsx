@@ -21,7 +21,7 @@ let set = new Set();
 let activeUsers = [];
 let nameMap = new Map();
 
-let socket = io();
+let socket = io(window.location.hostname);
 
 export function EmpChat(props){
 

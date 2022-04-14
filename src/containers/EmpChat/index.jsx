@@ -27,10 +27,7 @@ const db = getDatabase();
 
 // let socket = io();
 // console.log(socket)
-onValue(ref(db, 'messages/'), (snapshot) => {
-    console.log(snapshot)
-});
-    
+
 export function EmpChat(props){
 
     const [fetched, setFetched] = useState(false);
@@ -45,6 +42,13 @@ export function EmpChat(props){
     const[composeTo, setComposeTo] = useState();
     const [open, setOpen] = useState(false);
 
+    useEffect(() => {
+        onValue(ref(db, 'messages/'), (snapshot) => {
+            setFetched(false)
+            // console.log(snapshot)
+        });
+    },[fetched])
+        
     // useEffect(() => {
     //     socket.once("new", (arg) => {
     //         socket.off()

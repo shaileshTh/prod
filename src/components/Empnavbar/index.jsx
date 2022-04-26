@@ -69,7 +69,7 @@ export function EmpNavBar(props) {
               style={{ border: "none", background: "none" }}
               onClick={() => {
                 axios
-                  .get("https://ksu-tm.herokuapp.com/logout")
+                  .post("https://ksu-tm.herokuapp.com/logout")
                   .then((response) => {
                     if (response.status === 200) {
                       history.replace("/");

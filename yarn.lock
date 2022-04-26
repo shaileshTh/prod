@@ -1858,7 +1858,7 @@
   dependencies:
     "tslib" "^1.7.0"
 
-"@progress/kendo-drawing@^1.0.0", "@progress/kendo-drawing@^1.2.0", "@progress/kendo-drawing@^1.5.12":
+"@progress/kendo-drawing@^1.0.0", "@progress/kendo-drawing@^1.16.3", "@progress/kendo-drawing@^1.2.0", "@progress/kendo-drawing@^1.5.12":
   "integrity" "sha512-zUh0EjffezxJy4osPVeHflbosdlMk971hYj3zJ8mAHiswUei5UTIn7aAxfHDXu3Fpw2d9WyRi/LkI0xKWNmDRA=="
   "resolved" "https://registry.npmjs.org/@progress/kendo-drawing/-/kendo-drawing-1.16.3.tgz"
   "version" "1.16.3"

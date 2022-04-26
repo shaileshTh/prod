@@ -78,7 +78,7 @@ export function EditProfile(props) {
     useEffect(() => {
         axios.defaults.withCredentials = true;
         axios
-        .get("http://localhost:3001/all-users")
+        .get("https://ksu-tm.herokuapp.com/all-users")
         .then((response) =>{
             let arr = [];
             response.data.forEach((element) => {

@@ -18,7 +18,7 @@ export function ManagePatients(props) {
     useEffect(() => {
         axios.defaults.withCredentials = true;
 
-        axios.post('http://localhost:3001/me', { withCredentials: true })
+        axios.post('https://ksu-tm.herokuapp.com/me', { withCredentials: true })
             .then((response) => {
                 console.log(response.data)
                 setEmail(response.data.email);
@@ -33,7 +33,7 @@ export function ManagePatients(props) {
     useEffect(() => {
         axios.defaults.withCredentials = true;
         axios
-        .get("http://localhost:3001/all-users")
+        .get("https://ksu-tm.herokuapp.com/all-users")
         .then((response) =>{
             let arr = [];
             response.data.forEach((element) => {

@@ -131,7 +131,7 @@ const deleteApptConfirm = ({deleted})=>{
   let id= deleted[0].id;
 
   axios
-    .delete(`http://localhost:3001/appointment/nurseDeleteAppt/${id}`)
+    .delete(`https://ksu-tm.herokuapp.com/appointment/nurseDeleteAppt/${id}`)
     .then((response) => {
       console.log("deleteApptConfirm response: ", response.data)
       setAllAppointment((old) =>

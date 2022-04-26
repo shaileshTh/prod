@@ -27,7 +27,7 @@ export default function PatientList(props){
     axios.defaults.withCredentials = true;
 
     axios
-    .get("http://localhost:3001/all-users")
+    .get("https://ksu-tm.herokuapp.com/all-users")
     .then((response) =>{
         let arr = [];
         response.data.forEach((element) => {
@@ -44,7 +44,7 @@ export default function PatientList(props){
   useEffect(() => {
     axios.defaults.withCredentials = true;
 
-    axios.post('http://localhost:3001/get-patients-by-docId', 
+    axios.post('https://ksu-tm.herokuapp.com/get-patients-by-docId', 
     {
       "doctor_id" : props.doctorID
     },{ 
@@ -80,7 +80,7 @@ export default function PatientList(props){
     console.log('doctor ====>' + doctorId)
     let user = parseInt(userList[targetIndex].user_id)
     console.log(typeof(doctorId))
-    axios.put('http://localhost:3001/add-patient', 
+    axios.put('https://ksu-tm.herokuapp.com/add-patient', 
     {
       "doctor_id" : parseInt(doctorId),
       "user_to_add" : user
@@ -96,7 +96,7 @@ export default function PatientList(props){
 
   }
   const confirmDelete = () =>{
-    axios.put('http://localhost:3001/remove-assigned-doctor', 
+    axios.put('https://ksu-tm.herokuapp.com/remove-assigned-doctor', 
     {
       "user_id" : parseInt(toRemove)
     },{ 

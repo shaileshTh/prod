@@ -63,7 +63,7 @@ export function EmpDocuments(props) {
     const handleSearch = (selectedPatientID, e) => {
         e.preventDefault();
         console.log(selectedPatientID)
-        axios.get(`http://localhost:3001/documents/${selectedPatientID}`, { withCredentials: true })
+        axios.get(`https://ksu-tm.herokuapp.com/documents/${selectedPatientID}`, { withCredentials: true })
             .then((response) => {
                 setReports(response.data)
                 console.log(reports)

@@ -97,7 +97,7 @@ export function EmpChat(props){
         });
 
         if(isDoctor){
-            axios.post('http://localhost:3001/get-patients-by-docId', 
+            axios.post('https://ksu-tm.herokuapp.com/get-patients-by-docId', 
             {
               "doctor_id" : userID
             },{ 

@@ -51,7 +51,7 @@ export function EditProfileEmployee(props) {
 
         axios
         .put(
-          `http://localhost:3001/user/profile/${userID}`,
+          `https://ksu-tm.herokuapp.com/user/profile/${userID}`,
           {
             full_name: newName,
            

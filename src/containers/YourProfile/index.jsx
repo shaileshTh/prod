@@ -50,7 +50,7 @@ export function YourProfile(props) {
                 console.log("CHP/index.jsx" + err);
             });
             if(assignedDocId){
-                axios.get(`http://localhost:3001/user/find/${assignedDocId}`, { withCredentials: true })
+                axios.get(`https://ksu-tm.herokuapp.com/user/find/${assignedDocId}`, { withCredentials: true })
                 .then((response) => {
                     setAssignedDocName(response.data[0].full_name)
                 }).catch((err) => {

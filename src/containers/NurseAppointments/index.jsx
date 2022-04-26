@@ -1,7 +1,8 @@
 import React from "react";
 import { PageContainer } from "../../components/pageContainer";
 import { EmpNavBar } from "../../components/Empnavbar";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import { useHistory } from 'react-router-dom';
 import styled from "styled-components";
 import axios from "axios";
 import './style.css';
@@ -14,6 +15,7 @@ export function NurseAppointments(props) {
   const [doctorList, setDoctorList] = useState(null);
   const [userFullName, setUserFullName] = useState(null);
   const [selectedDoctorID, setSelectedDoctorID] = useState(null);
+	let history = useHistory();
 
   useEffect(() => {
     axios.defaults.withCredentials = true;
@@ -29,6 +31,7 @@ export function NurseAppointments(props) {
         setDoctorList(response.data.allDoctor);
       })
       .catch((err) => {
+        history.goBack();
         console.log("CHP/index.jsx" + err);
       });
   }, []);

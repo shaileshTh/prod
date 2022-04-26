@@ -4,8 +4,9 @@ import { PageContainer } from "../../components/pageContainer";
 import { EmpNavBar } from "../../components/Empnavbar";
 import { useState, useEffect } from "react";
 import styled from "styled-components";
+import { useHistory } from 'react-router-dom';
 import axios from "axios";
-import { Scheduler, DayView, SchedulerViewItem } from "@progress/kendo-react-scheduler";
+import { Scheduler, DayView } from "@progress/kendo-react-scheduler";
 import parse from 'html-react-parser'
 import '@progress/kendo-theme-default/dist/all.css';
 
@@ -24,6 +25,7 @@ export function EmpAppointments(props) {
   const [userFullName, setUserFullName] = useState(null);
   // const todayDate = new Date().toISOString().split("T")[0];
 
+	let history = useHistory();
 
   useEffect(() => {
     axios.defaults.withCredentials = true;
@@ -59,6 +61,7 @@ export function EmpAppointments(props) {
         }
       })
       .catch((err) => {
+        history.goBack();
         console.log("CHP/index.jsx" + err);
       });
   }, []);

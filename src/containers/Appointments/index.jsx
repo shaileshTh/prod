@@ -7,12 +7,15 @@ import axios from "axios";
 import parse from 'html-react-parser';
 import { Scheduler, DayView } from "@progress/kendo-react-scheduler";
 import {  guid } from "@progress/kendo-react-common";
+import { useHistory } from 'react-router-dom';
+
 
 var zoom1 = "https://us04web.zoom.us/j/3839197009?pwd=O5yDRmWmm9QnV64e_bnzUZr4_pcLlG.1";
 // This is Nate's personal zoom
 var zoom2 = "https://us05web.zoom.us/j/3481873040?pwd=eVp2ZDI5MEdwS2NZc25BN0xBTGNNQT09";
 // Email ksudoctorone@gmail.com
 // Password Doctor123
+
 
 export function Appointments(props) {
   const [email, setEmail] = useState("Not logged in");
@@ -24,6 +27,7 @@ export function Appointments(props) {
   const [allAppointment, setAllAppointment] = useState([]);
   const displayDate = new Date(new Date().toISOString());
   let doctors = [];
+  let history = useHistory();
 
 
   useEffect(() => {
@@ -62,7 +66,8 @@ export function Appointments(props) {
 
       })
       .catch((err) => {
-        console.log("customer homepage index.jsx" + err);
+        history.goBack();
+        console.log(" index.jsx" + err);
       });
 
       if(assignedDoctor){

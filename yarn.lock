@@ -1921,7 +1921,7 @@
     "@progress/kendo-react-popup" "5.2.0"
     "prop-types" "^15.6.0"
 
-"@progress/kendo-react-form@^5.0.0":
+"@progress/kendo-react-form@^5.0.0", "@progress/kendo-react-form@^5.2.0":
   "integrity" "sha512-aUkGBlriCpdrHlRI7dJ19vKQLTOr50xAJrjirvYNHohPo7G7T0k7yQM/Tjd8mR3nh5S3dhT91rcFR2SvHIanYw=="
   "resolved" "https://registry.npmjs.org/@progress/kendo-react-form/-/kendo-react-form-5.2.0.tgz"
   "version" "5.2.0"

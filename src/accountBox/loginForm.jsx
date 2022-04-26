@@ -19,7 +19,7 @@ export function LoginForm(props){
     
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('https://ksu-project-be.herokuapp.com/login', {
+        axios.post('https://ksu-tm.herokuapp.com/login', {
             email : email,
             password: password
           },{

@@ -20,7 +20,7 @@ export function SignUpForm(props){
     axios.defaults.withCredentials = true;
 
         e.preventDefault();
-        axios.post('https://ksu-project-be.herokuapp.com/register', {
+        axios.post('https://ksu-tm.herokuapp.com/register', {
             full_name: name,
             email : email,
             password: password,

@@ -48,7 +48,7 @@ export function EmpDocuments(props) {
         e.preventDefault();
         filesUploaded.forEach((link) => {
             axios
-            .post("https://ksu-project-be.herokuapp.com/documents", 
+            .post("https://ksu-tm.herokuapp.com/documents", 
             { 
                 user_id: selectedPatientID,
                 description: description,
@@ -88,7 +88,7 @@ export function EmpDocuments(props) {
     useEffect(() => {
         axios.defaults.withCredentials = true;
 
-        axios.post('https://ksu-project-be.herokuapp.com/me', { withCredentials: true })
+        axios.post('https://ksu-tm.herokuapp.com/me', { withCredentials: true })
             .then((response) => {
                 console.log(response.data)
                 setEmail(response.data.email)
@@ -99,7 +99,7 @@ export function EmpDocuments(props) {
                 console.log("CHP/index.jsx" + err);
             })
 
-        axios.get(`https://ksu-project-be.herokuapp.com/documents/${user_id}`, { withCredentials: true })
+        axios.get(`https://ksu-tm.herokuapp.com/documents/${user_id}`, { withCredentials: true })
             .then((response) => {
                 setReports(response.data)
             }) 
@@ -107,7 +107,7 @@ export function EmpDocuments(props) {
                 console.log(err.message)
             })
         
-            axios.get("https://ksu-project-be.herokuapp.com/user/findAll")
+            axios.get("https://ksu-tm.herokuapp.com/user/findAll")
                 .then((response) => {
                     response.data.forEach((element) => {
                         if (element.user_type === "patient") {

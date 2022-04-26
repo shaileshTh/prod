@@ -18,7 +18,7 @@ export function EmpNavBar(props) {
     axios.defaults.withCredentials = true;
 
     axios
-      .post("https://ksu-project-be.herokuapp.com/me", { withCredentials: true })
+      .post("https://ksu-tm.herokuapp.com/me", { withCredentials: true })
       .then((response) => {
         setUserType(checkUserType(response.data.user_type));
       })
@@ -69,7 +69,7 @@ export function EmpNavBar(props) {
               style={{ border: "none", background: "none" }}
               onClick={() => {
                 axios
-                  .get("https://ksu-project-be.herokuapp.com/logout")
+                  .get("https://ksu-tm.herokuapp.com/logout")
                   .then((response) => {
                     if (response.status === 200) {
                       history.replace("/");

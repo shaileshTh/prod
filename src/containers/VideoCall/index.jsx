@@ -33,7 +33,7 @@ export function VideoCall(props) {
     useEffect(() => {
         axios.defaults.withCredentials = true;
 
-        axios.post('https://ksu-project-be.herokuapp.com/me', { withCredentials: true })
+        axios.post('https://ksu-tm.herokuapp.com/me', { withCredentials: true })
             .then((response) => {
                 console.log(response.data)
                 setEmail(response.data.full_name)
@@ -44,7 +44,7 @@ export function VideoCall(props) {
         
         // Doctors list
         axios
-            .get("https://ksu-project-be.herokuapp.com/all-users")
+            .get("https://ksu-tm.herokuapp.com/all-users")
             .then((response) =>{
                 let arr = [];
                 response.data.forEach((element) => {

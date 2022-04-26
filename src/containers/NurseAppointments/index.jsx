@@ -19,7 +19,7 @@ export function NurseAppointments(props) {
     axios.defaults.withCredentials = true;
 
     axios
-      .post("https://ksu-project-be.herokuapp.com/me", { withCredentials: true })
+      .post("https://ksu-tm.herokuapp.com/me", { withCredentials: true })
       .then((response) => {
         console.log("Nurse appt page me: ", response.data);
         setEmail(response.data.email);
@@ -47,7 +47,7 @@ const displayDate = new Date(new Date().toISOString())
 useEffect(()=>{
   if(selectedDoctorID != null){
     axios
-    .get(`https://ksu-project-be.herokuapp.com/doctorAppTime/${selectedDoctorID}`)
+    .get(`https://ksu-tm.herokuapp.com/doctorAppTime/${selectedDoctorID}`)
     .then((response) => {
       // console.log("get appt response: ", response.data)
       showAppt(response);
@@ -103,7 +103,7 @@ const showAppt= (response) =>{
  */
 const updateApptConfirm = ({updated})=>{
   axios
-    .put('https://ksu-project-be.herokuapp.com/appointment/nurseUpdateAppt', {
+    .put('https://ksu-tm.herokuapp.com/appointment/nurseUpdateAppt', {
       id: updated[0].id,
       title: updated[0].title,
     })

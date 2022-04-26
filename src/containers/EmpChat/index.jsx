@@ -66,7 +66,7 @@ export function EmpChat(props){
     useEffect(() => {
         axios.defaults.withCredentials = true;
         axios
-        .get("https://ksu-project-be.herokuapp.com/all-users")
+        .get("https://ksu-tm.herokuapp.com/all-users")
         .then((response) =>{
             let arr = [];
             response.data.forEach((element) => {
@@ -86,7 +86,7 @@ export function EmpChat(props){
         axios.defaults.withCredentials = true;
 
         axios
-        .post("https://ksu-project-be.herokuapp.com/me", { withCredentials: true })
+        .post("https://ksu-tm.herokuapp.com/me", { withCredentials: true })
         .then((response) => {
             setEmail(response.data.email);
             setUserID(response.data.user_id);
@@ -113,7 +113,7 @@ export function EmpChat(props){
     }, [userID, isDoctor])
     useEffect(() => {
         axios
-            .get("https://ksu-project-be.herokuapp.com/messaging")
+            .get("https://ksu-tm.herokuapp.com/messaging")
             .then((response) =>{
                 messageArr = response.data.filter((item) => {
                     return item.recipient_id === userID || item.sender_id === userID
@@ -133,7 +133,7 @@ export function EmpChat(props){
                 setAllMessages(messageArr)
                 activeUsers.forEach((id) => {
                     axios
-                    .get(`https://ksu-project-be.herokuapp.com/user/find/${id}`, { withCredentials: true },
+                    .get(`https://ksu-tm.herokuapp.com/user/find/${id}`, { withCredentials: true },
                     { }).then((response) => {
                         nameMap.set(id, response.data[0].full_name)
                         if(nameMap.size === activeUsers.length) setMapDone(true)
@@ -189,7 +189,7 @@ export function EmpChat(props){
         });
       
        axios
-        .post("https://ksu-project-be.herokuapp.com/messaging", 
+        .post("https://ksu-tm.herokuapp.com/messaging", 
         { 
             sender_id: userID,
             recipient_id: userList[composeTo].user_id,
@@ -201,7 +201,7 @@ export function EmpChat(props){
     const handleModalSubmitPatient = (e) =>{
         e.preventDefault();
        axios
-        .post("https://ksu-project-be.herokuapp.com/messaging", 
+        .post("https://ksu-tm.herokuapp.com/messaging", 
         { 
             sender_id: userID,
             recipient_id: composeToPatient,
@@ -217,7 +217,7 @@ export function EmpChat(props){
         });
         // setFetched(false);
         axios
-        .post("https://ksu-project-be.herokuapp.com/messaging", 
+        .post("https://ksu-tm.herokuapp.com/messaging", 
         { 
             sender_id: userID,
             recipient_id: e.target.parentElement.id,

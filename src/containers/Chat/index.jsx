@@ -18,7 +18,7 @@ import { ref, onValue, set } from "firebase/database";
 
 // import { io } from "socket.io-client";
 // const EventSource = require('eventsource')
-// const es = new EventSource('https:///ksu-project-be.herokuapp.com/sse')
+// const es = new EventSource('https:///ksu-tm.herokuapp.com/sse')
 
 
 
@@ -64,7 +64,7 @@ export function Chat(props){
         axios.defaults.withCredentials = true;
 
         axios
-        .post("https://ksu-project-be.herokuapp.com/me", { withCredentials: true})
+        .post("https://ksu-tm.herokuapp.com/me", { withCredentials: true})
         .then((response) => {
             setEmail(response.data.email);
             setUserID(response.data.user_id);
@@ -74,7 +74,7 @@ export function Chat(props){
             console.log("CHP/index.jsx" + err);
         });
         if(assignedDocId){
-            axios.get(`https://ksu-project-be.herokuapp.com/user/find/${assignedDocId}`, { withCredentials: true })
+            axios.get(`https://ksu-tm.herokuapp.com/user/find/${assignedDocId}`, { withCredentials: true })
             .then((response) => {
                 setAssignedDocName(response.data[0].full_name)
             }).catch((err) => {
@@ -85,7 +85,7 @@ export function Chat(props){
     }, [userID, assignedDocId])
     useEffect(()=>{
         axios
-            .get("https://ksu-project-be.herokuapp.com/messaging")
+            .get("https://ksu-tm.herokuapp.com/messaging")
             .then((response) =>{
                 messageArr = response.data.filter((item) => {
                     return item.recipient_id === userID || item.sender_id === userID
@@ -105,7 +105,7 @@ export function Chat(props){
                 setAllMessages(messageArr)
                 activeUsers.forEach((id) => {
                     axios
-                    .get(`https://ksu-project-be.herokuapp.com/user/find/${id}`, { withCredentials: true },
+                    .get(`https://ksu-tm.herokuapp.com/user/find/${id}`, { withCredentials: true },
                     { }).then((response) => {
                         nameMap.set(id, response.data[0].full_name)
                         if(nameMap.size === activeUsers.length) setMapDone(true)
@@ -141,7 +141,7 @@ export function Chat(props){
             message: e.target[0].value
         });
        axios
-        .post("https://ksu-project-be.herokuapp.com/messaging", 
+        .post("https://ksu-tm.herokuapp.com/messaging", 
         { 
             sender_id: userID,
             recipient_id: assignedDocId,
@@ -159,7 +159,7 @@ export function Chat(props){
         });
         // setFetched(false);
         axios
-        .post("https://ksu-project-be.herokuapp.com/messaging", 
+        .post("https://ksu-tm.herokuapp.com/messaging", 
         { 
             sender_id: userID,
             recipient_id: e.target.parentElement.id,

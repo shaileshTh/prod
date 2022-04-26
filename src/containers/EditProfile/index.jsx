@@ -46,7 +46,7 @@ export function EditProfile(props) {
     useEffect(() => {
         axios.defaults.withCredentials = true;
 
-        axios.post('https://ksu-project-be.herokuapp.com/me', { withCredentials: true })
+        axios.post('https://ksu-tm.herokuapp.com/me', { withCredentials: true })
             .then((response) => {
                 console.log(response.data)
                 setEmail(response.data.email);
@@ -105,7 +105,7 @@ export function EditProfile(props) {
 
         axios
         .put(
-          `https://ksu-project-be.herokuapp.com/user/profile/${userID}`,
+          `https://ksu-tm.herokuapp.com/user/profile/${userID}`,
           {
             // full_name: newName,
             birthdate: dob,

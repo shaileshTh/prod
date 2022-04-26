@@ -31,7 +31,7 @@ export function Appointments(props) {
     let arr = [];
 
     axios
-      .post("https://ksu-project-be.herokuapp.com/me", { withCredentials: true })
+      .post("https://ksu-tm.herokuapp.com/me", { withCredentials: true })
       .then((response) => {
         setEmail(response.data.email);
         setUserID(response.data.user_id);
@@ -76,7 +76,7 @@ export function Appointments(props) {
     }
 
     axios
-      .get("https://ksu-project-be.herokuapp.com/user/findAll")
+      .get("https://ksu-tm.herokuapp.com/user/findAll")
       .then((response) => {
         response.data.forEach((element) => {
           if (element.user_type === "doctor") {
@@ -132,7 +132,7 @@ export function Appointments(props) {
 
     axios
     .post(
-      "https://ksu-project-be.herokuapp.com/appointment",
+      "https://ksu-tm.herokuapp.com/appointment",
       {
         appt_date: apptDate,
         start: start,

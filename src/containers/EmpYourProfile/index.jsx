@@ -14,7 +14,7 @@ export function EmpYourProfile(props) {
     useEffect(() => {
         axios.defaults.withCredentials = true;
 
-        axios.post('https://ksu-project-be.herokuapp.com/me', { withCredentials: true })
+        axios.post('https://ksu-tm.herokuapp.com/me', { withCredentials: true })
             .then((response) => {
                 console.log(response.data)
                 setEmail(response.data.full_name)

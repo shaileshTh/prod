@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { Link, useHistory} from 'react-router-dom';
 import { NavBar } from "../../components/navbar";
+import { AppointmentBanner } from "../../components/appointmentBanner";
 import { PageContainer } from "../../components/pageContainer";
 import './style.css';
 import axios from 'axios';
@@ -28,8 +29,14 @@ export function CustomerHomePage(props) {
 			})
 	}, [])
 
+	useEffect(() => {
+		document.title = "Patient Home Page";  
+	  }, []);
+
 	return (<>
 		<NavBar email={email} />
+		{/* Uncomment to test alert banner */}
+		{/* <AppointmentBanner/> */}
 		<PageContainer>
 			<div className="container">
 				<div className="row">
@@ -41,7 +48,7 @@ export function CustomerHomePage(props) {
 							<div className="icon">
 								<img src={accountIcon} alt="account icon" />
 							</div>
-							<Link to="/customerhomepage/yourprofile"><div className="card-box-footer">View More</div></Link>
+							<Link to="/customerhomepage/yourprofile"><div className="card-box-footer"></div></Link>
 						</div>
 					</div>
 
@@ -53,7 +60,7 @@ export function CustomerHomePage(props) {
 							<div className="icon">
 								<img src={calendarIcon} alt="calendar icon" />
 							</div>
-							<Link to="/customerhomepage/appointments"><div className="card-box-footer">View More</div></Link>
+							<Link to="/customerhomepage/appointments"><div className="card-box-footer"></div></Link>
 						</div>
 					</div>
 					<div className="col-lg-4 col-sm-6">
@@ -64,7 +71,7 @@ export function CustomerHomePage(props) {
 							<div className="icon">
 								<img src={videoIcon} alt="video icon" />
 							</div>
-							<Link to="/customerhomepage/videocall"><div className="card-box-footer">View More</div></Link>
+							<Link to="/customerhomepage/videocall"><div className="card-box-footer"></div></Link>
 						</div>
 					</div>
 					<div className="col-lg-4 col-sm-6">
@@ -75,7 +82,7 @@ export function CustomerHomePage(props) {
 							<div className="icon">
 								<img src={chatIcon} alt="chat icon" />
 							</div>
-							<Link to="/customerhomepage/chat"><div className="card-box-footer">View More</div></Link>
+							<Link to="/customerhomepage/chat"><div className="card-box-footer"></div></Link>
 						</div>
 					</div>
 					<div className="col-lg-4 col-sm-6">
@@ -86,7 +93,7 @@ export function CustomerHomePage(props) {
 							<div className="icon">
 								<img src={documentsIcon} alt="documents icon" />
 							</div>
-							<Link to="/customerhomepage/documents"><div className="card-box-footer">View More</div></Link>
+							<Link to="/customerhomepage/documents"><div className="card-box-footer"></div></Link>
 						</div>
 					</div>
 				</div>

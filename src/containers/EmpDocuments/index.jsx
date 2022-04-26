@@ -6,6 +6,11 @@ import axios from 'axios';
 import { Form, Row, Col, FormControl, Button, Modal, Alert } from "react-bootstrap";
 import { PickerInline } from 'filestack-react';
 
+const options = {
+    fromSources: ["local_file_system", "url"],
+    displayMode: "dropPane"
+}
+
 
 function formatDate(date) {
  
@@ -28,6 +33,8 @@ export function EmpDocuments(props) {
     const [show, setShow] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [patientList, setPatientList] = useState(null);
+    const [fullName, setFullName] = useState("");
+    const [preview, setPreview] = useState({})
     let patients = [];
 
     const handleClose = () => setShow(false);
@@ -37,15 +44,13 @@ export function EmpDocuments(props) {
         setUploaded(false)
     }
 
-
-    //submits for user 22 currently. (patient@patient)
     const handleSubmit = (e) => {
         e.preventDefault();
         filesUploaded.forEach((link) => {
             axios
             .post("https://ksu-project-be.herokuapp.com/documents", 
             { 
-                user_id: 22,
+                user_id: selectedPatientID,
                 description: description,
                 link: link.url
             }).then(res => console.log(res))
@@ -55,19 +60,40 @@ export function EmpDocuments(props) {
         setShowSuccess(true)
     }
 
+    const handleSearch = (selectedPatientID, e) => {
+        e.preventDefault();
+        console.log(selectedPatientID)
+        axios.get(`http://localhost:3001/documents/${selectedPatientID}`, { withCredentials: true })
+            .then((response) => {
+                setReports(response.data)
+                console.log(reports)
+    
+            }) 
+            .catch((err) => {
+                console.log(err.message)
+            })
+
+    }
+
+    const handleClick = (doc, e) => {
+        e.preventDefault();
+        setPreview(doc)
+        setShow(true)
+    }
+
     const handleDescriptionChange = (e) => {
         setDescription(e.target.value)
     }
-
-
-        
+  
     useEffect(() => {
         axios.defaults.withCredentials = true;
 
         axios.post('https://ksu-project-be.herokuapp.com/me', { withCredentials: true })
             .then((response) => {
                 console.log(response.data)
-                setEmail(response.data.full_name)
+                setEmail(response.data.email)
+                setFullName(response.data.full_name)
+                setID(response.data.user_id)
             })
             .catch((err) => {
                 console.log("CHP/index.jsx" + err);
@@ -96,11 +122,15 @@ export function EmpDocuments(props) {
 
     }, [user_id])
 
+    useEffect(() => {
+        document.title = "Documents";  
+      }, []);
+
     const [selectedPatientID, setSelectedPatientID] = useState(null);
-    const [selectedPatientName, setSelectedPatientName] = useState(null);
+    
 
     return (<>
-        <EmpNavBar email={email} />
+        <EmpNavBar email={fullName} />
             <h1 className="text-center mb-3 mt-4">Document Portal</h1>
             <Modal 
                 show={showSuccess} 
@@ -129,12 +159,13 @@ export function EmpDocuments(props) {
                     <Col sm={10}>
                         <Form.Select 
                             aria-label=""
-                            onChange={(e) => {setSelectedPatientID(e.target.value.split("-")[0]); setSelectedPatientName(e.target.value.split("-")[1])}}
+                            onChange={(e) => 
+                                setSelectedPatientID(e.target.value)}
                         >
                             <option>Current Patients</option>
                             {patientList
                             ? patientList.map((patient) => (
-                                <option key={patient.id} value={patient.name}>{patient.name}</option>
+                                <option key={patient.id} value={patient.id}>{patient.name}</option>
                             ))
                             : null}    
                         </Form.Select>  
@@ -148,6 +179,7 @@ export function EmpDocuments(props) {
                 </Alert>
                 <PickerInline
                     apikey="ADRLkeKpRRGZuFOBdJR0Hz"
+                    pickerOptions={options}
                     onSuccess={(res) => console.log(res)}
                     onUploadDone={(res) => {
                         setUploaded(true)
@@ -163,7 +195,6 @@ export function EmpDocuments(props) {
                     <FormControl value = {description} onChange = {(e) => handleDescriptionChange(e)} type="text" />
                     </Col>
                 </Form.Group>
-
                 <Button type="submit" variant="success">Submit</Button>{' '}
             </Form>
          
@@ -178,29 +209,73 @@ export function EmpDocuments(props) {
                     <Col sm={10}>
                         <Form.Select 
                             aria-label=""
-                            onChange={(e) => {setSelectedPatientID(e.target.value.split("-")[0]); setSelectedPatientName(e.target.value.split("-")[1])}}
-                        >
+                            onChange={(e) => {setSelectedPatientID(e.target.value)}} >
+                            {console.log(selectedPatientID)}
                             <option>Current Patients</option>
                             {patientList
                             ? patientList.map((patient) => (
-                                <option key={patient.id} value={patient.name}>{patient.name}</option>
+                                <option key={patient.id} value={patient.id}>{patient.name}</option>
                             ))
-                            : null}    
+                            : null} 
                         </Form.Select>  
+                        
                     </Col>
                 </Form.Group>
 
-        <Button variant="success" onClick={handleShow}>Search</Button>
+        <Button variant="success"
+                onClick={(e) => handleSearch(selectedPatientID,e)}>Search</Button>
+         </div>
+         {reports.length === 0 ? <h3 className="text-center mb-3 mt-4"></h3>
+            :<>
+            <h3 className="text-center mb-3 mt-4">Selected Patient's Reports</h3>
+            <table className="table mt-5 text-center">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Description</th>
+                        <th>Document Link</th>
+                        <th>Preview</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {reports.map((report) => (
+                        <tr key={report.date_time}>
+                            <td>{formatDate(report.date_time)}</td>
+                            <td>{report.description}</td>
+                            <td><a href = {report.link} target ="_blank" rel ="noreferer noopener noreferrer">Open in new tab</a></td>
+                            <td><Button onClick = {(e) => handleClick(report, e)}>Preview</Button></td>
+                        </tr>
+                    ))}    
+                </tbody>
+            </table>
+            <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>Document Preview</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+            <iframe title = {preview.description} src = {preview.link} height = "400px" style = {{margin:'0 auto', display:'block'}}/>
+            </Modal.Body>
+        </Modal>
+            </>
+            }
+            
 
-        <Modal 
+        <div>
+
+        </div>
+        <br/>
+
+        {/* <Modal 
         show={show} 
         onHide={handleClose}
         size="lg"
+        fullscreen="true"
+        backdrop="static"
         aria-labelledby="contained-modal-title-vcenter"
         centered>
                 
         <Modal.Header closeButton>
-          <Modal.Title>Patient Reports for John Doe</Modal.Title>
+          <Modal.Title>Patient Reports for {selectedPatientName} </Modal.Title>
         </Modal.Header>
         <Modal.Body>
             <Fragment>
@@ -231,8 +306,8 @@ export function EmpDocuments(props) {
           </Button>
           
         </Modal.Footer>
-      </Modal>
-        </div>
+      </Modal> */}
+        
         </>
     );
 }

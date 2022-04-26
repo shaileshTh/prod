@@ -4,30 +4,32 @@ import { NavBar } from "../../components/navbar";
 import { PageContainer } from "../../components/pageContainer";
 import './style.css';
 import zoomIcon from "../../images/zoom_logo.png";
-// import axios from 'axios';
-import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import axios from 'axios';
-// import { useState, useEffect } from "react";
-// import { NavBar } from "../../components/navbar";
-import { io } from "socket.io-client";
-import ScrollableFeed from 'react-scrollable-feed'
 import Collapse from 'react-bootstrap/Collapse'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Badge from 'react-bootstrap/Badge'
 
 let index;
-let messageArr = [];
 let set = new Set();
-let activeUsers = [];
-let nameMap = new Map();
+var dateTime = new Date();
+var zoom1 = "https://us04web.zoom.us/j/3839197009?pwd=O5yDRmWmm9QnV64e_bnzUZr4_pcLlG.1";
+// This is Nate's personal zoom
+var zoom2 = "https://us05web.zoom.us/j/3481873040?pwd=eVp2ZDI5MEdwS2NZc25BN0xBTGNNQT09";
+// Email ksudoctorone@gmail.com
+// Password Doctor123
 
 export function VideoCall(props) {
     const [email, setEmail] = useState('Not logged in');
     const [userList, setUserList] = useState([])
     const [show, setShow] = useState(false);
-    const[composeTo, setComposeTo] = useState('');
+    const [composeTo, setComposeTo] = useState('');
     const [open, setOpen] = useState(false);
+    const [curTime, setCurTime] = useState();
+    const [curDate, setCurDate] = useState();
+    const [checked, setChecked] = useState(false);
+    const [zoomLink, setZoomLink] = useState();
+
     useEffect(() => {
         axios.defaults.withCredentials = true;
 
@@ -64,20 +66,52 @@ export function VideoCall(props) {
 
     }, [composeTo])
 
+    useEffect(() => {
+        setCurTime(dateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
+        setCurDate(dateTime.toLocaleDateString());
+    })
+
+    useEffect(() => {
+        document.title = "Video Call";  
+      }, []);
+
+    useEffect(() => {
+        if (composeTo === "doctor@doctor") {
+            setZoomLink(zoom1);
+            console.log("zoom1");
+        } else {
+            setZoomLink(zoom2);
+            console.log("zoom2");
+        }
+    })
+
     const handleClick = (e) => {
         let targetIndex;
         if (e.target.id === "") targetIndex = e.target.parentElement.id;
         else targetIndex = e.target.id;
         console.log("targetindex" + targetIndex)
-        setComposeTo(userList[targetIndex].full_name)
+        setComposeTo(userList[targetIndex].email)
         // console.log('---' + userList[targetIndex].full_name)
         setTimeout(()=>{
             setShow(true);
         },100)
     }
 
+    const handleCheck = () => {
+        setChecked(!checked);
+    }
+    
+    const joinMeeting = () => {
+        if (composeTo) {
+            window.location.href = zoomLink;
+        } else {
+            alert("Please select your doctor");
+        }
+    }
+
     index = -1
     // if(composeTo !== undefined) return (<h1>Loading...</h1>)
+    
 
     return (<>
         <NavBar email={email} />
@@ -127,14 +161,17 @@ export function VideoCall(props) {
                 </div>
                 <div>
                     <p class="m-b-10 f-w-600">Time</p>
-                    <h6 class="text-muted f-w-400">12:00 PM</h6>
+                    <h6 class="text-muted f-w-400">{curTime}</h6>
                 </div>
                 <div>
                     <p class="m-b-10 f-w-600">Date</p>
-                    <h6 class="text-muted f-w-400">mm/dd/yyyy</h6>
+                    <h6 class="text-muted f-w-400">{curDate}</h6>
                 </div>
-                {/* <button class="btn btn-primary" type="submit">Launch Meeting</button> */}
-                <a id="Join meeting" href="https://us04web.zoom.us/j/77685262436?pwd=I0qcN5jBMhT-sdQT0d9nVVS5kYbOwu.1">Join Call</a>
+                <div> <label>
+                    <input type="checkbox" checked={checked} onChange={handleCheck}/> By checking this box, you agree to the company's Privacy Policy for electronic health care.<div>Recording a session must be agreed by all participants.</div>
+                </label></div>
+                {(checked) ? <button class="btn btn-primary" type="submit" onClick={joinMeeting}>Join Call</button> : <div></div>}
+
             </div>
         </PageContainer>
     </>

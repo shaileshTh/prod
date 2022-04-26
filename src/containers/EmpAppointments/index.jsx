@@ -1,83 +1,133 @@
-import React from "react";
+import React, { Children } from "react";
 import Button from "react-bootstrap/Button";
 import { PageContainer } from "../../components/pageContainer";
 import { EmpNavBar } from "../../components/Empnavbar";
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
-// import ScheduleSelector from "react-schedule-selector";
+import { Scheduler, DayView, SchedulerViewItem } from "@progress/kendo-react-scheduler";
+import parse from 'html-react-parser'
+import '@progress/kendo-theme-default/dist/all.css';
+
+var zoom1 = "https://us04web.zoom.us/j/3839197009?pwd=O5yDRmWmm9QnV64e_bnzUZr4_pcLlG.1";
+// This is Nate's personal zoom
+var zoom2 = "https://us05web.zoom.us/j/3481873040?pwd=eVp2ZDI5MEdwS2NZc25BN0xBTGNNQT09";
+// Email ksudoctorone@gmail.com
+// Password Doctor123
 
 export function EmpAppointments(props) {
   const [email, setEmail] = useState("Not logged in");
   const [userID, setUserID] = useState(null);
-  // const [schedule, setSchedule] = useState([]);
-  // const [updated, setUpdated] = useState(false);
-  const [allAppointment, setAllAppointment] = useState(null);
+  const displayDate = new Date(new Date().toISOString())
+  const [allAppointment, setAllAppointment] = useState([]);
+  const [zoomLink, setZoomLink] = useState();
+  const [userFullName, setUserFullName] = useState(null);
   // const todayDate = new Date().toISOString().split("T")[0];
+
 
   useEffect(() => {
     axios.defaults.withCredentials = true;
-
+    let arr = [];
     axios
       .post("https://ksu-project-be.herokuapp.com/me", { withCredentials: true })
       .then((response) => {
         console.log("Doctor appt page me: ", response.data);
-        setEmail(response.data.full_name);
+        setEmail(response.data.email);
+        setUserFullName(response.data.full_name);
         setUserID(response.data.user_id);
-        setAllAppointment(response.data.userAppointment);
+
+        if(response.data.userAppointment !== 0){
+          response.data.userAppointment.forEach((appt) => {
+            if(appt.confirmed === false){
+              return;
+            }
+            let start = new Date(appt.start);
+            let end = new Date(appt.end)
+            let id = appt.id;
+            let description= appt.description;
+            let title = parse(`<h5><a href = "#" style = "color:white;"><i>Click to join </i><b>${appt.title}</b> with <b>${appt.patient_name}</b></a></h5>`);
+
+            arr.push({
+              id: id,
+              title: title,
+              description: description,
+              start: start,
+              end: end,
+            })
+          })
+          setAllAppointment(arr);
+        }
       })
       .catch((err) => {
         console.log("CHP/index.jsx" + err);
       });
   }, []);
 
+  // useEffect(() => {
+  //   document.title = "Appointments";  
+  // }, []);
+
+  // useEffect(() => {
+  //   if (email === "doctor@doctor") {
+  //       setZoomLink(zoom1);
+  //       // console.log("zoom1");
+  //   } else {
+  //       setZoomLink(zoom2);
+  //       // console.log("zoom2");
+  //   }
+  // });   
+
   return (
     <>
-      <EmpNavBar email={email} />
+      <EmpNavBar email={userFullName} />
       <PageContainer>
-        <PseudoBorder>Upcoming Appointments</PseudoBorder>
-        <UserAppointmentContainer>
-          <table className="table">
-            <thead>
-              <tr>
-                <th scope="col" style={{ width: "10vw" }}>
-                  Appointments ID
-                </th>
-                <th scope="col" style={{ width: "8vw" }}>
-                  Patient ID
-                </th>
-                <th scope="col" style={{ width: "10vw" }}>
-                  Patient Name
-                </th>
-                <th scope="col" style={{ width: "10vw" }}>
-                  Date
-                </th>
-                <th scope="col" style={{ width: "10vw" }}>
-                  Start
-                </th>
-                <th scope="col" style={{ width: "10vw" }}>
-                  Confirmed
-                </th>
-                <th scope="col" style={{ width: "10vw" }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {allAppointment
-                ?
-                allAppointment.sort((a, b) => b.appt_date < a.appt_date ? 1: -1).sort((a, b) => b.appt_start < a.appt_start ? 1: -1).map((item) => (
-                    <tr key={item.appt_id}>
-                      <th scope="row">{item.appt_id}</th>
-                      <th scope="row">{item.patient_id}</th>
-                      <th scope="row">{item.patient_name}</th>
-                      <td>{item.appt_date.split("T")[0]}</td>
-                      <td>{item.appt_start.split("+")[0]}</td>
-                      <td>{item.confirmed ? `True` : `False`}</td>
-                    </tr>
-                  ))
-                : null}
-            </tbody>
-          </table>
-        </UserAppointmentContainer>
+        <br/>
+      {allAppointment.length === 0 ? 
+        <>
+          <PseudoBorder>No Upcoming Appointments</PseudoBorder>
+          <br/>
+          <Scheduler 
+            style = {{maxWidth: '700px'}}
+            data={null} 
+            defaultDate={displayDate} 
+            timezone="Etc/UTC"
+            editable={false}
+            >  
+            <DayView 
+              startTime={"05:00"}
+              endTime={"19:00"}
+              workDayStart={"08:00"}
+              workDayEnd={"18:00"}
+              slotDivisions={1}
+              slotDuration={60}
+              editable={false}
+            />
+          </Scheduler>
+        </>
+      :
+        <>
+          <PseudoBorder>Upcoming Appointments</PseudoBorder>
+          <br/>
+          <Scheduler 
+            style = {{maxWidth: '700px'}}
+            data={allAppointment} 
+            defaultDate={displayDate} 
+            timezone="Etc/UTC"
+            editable={false}
+            >  
+            <DayView 
+              startTime={"05:00"}
+              endTime={"19:00"}
+              workDayStart={"08:00"}
+              workDayEnd={"18:00"}
+              slotDivisions={1}
+              slotDuration={60}
+              editable={false}
+            />
+          </Scheduler>
+        </>
+      }
+      
       </PageContainer>
     </>
   );
@@ -99,49 +149,6 @@ const PseudoBorder = styled.h1`
     background: #00f;
   }
 `;
-
-// const FormContainer = styled.form`
-//   display: flex;
-//   flex-direction: column;
-//   width: 90vw;
-//   margin-left: 40px;
-// `;
-// const Title = styled.h1`
-//   font-size: 16px;
-//   width: 200px;
-// `;
-
-// const Input = styled.input`
-//   width: 220px;
-//   margin-bottom: 5px;
-// `;
-// const ReasonInput = styled.textarea`
-//   width: 300px;
-//   height: 100px;
-//   margin-bottom: 5px;
-// `;
-
-// const Select = styled.select`
-//   padding: 5px;
-//   width: 150px;
-// `;
-
-// const Option = styled.option``;
-
-// const Submit = styled.button`
-//   display: flex;
-//   justify-content: center;
-//   width: 100px;
-//   border-radius: 5px;
-//   margin-top: 30px;
-//   background-color: white;
-//   transition: all 0.5s ease;
-
-//   &:hover {
-//     background-color: #e9f5f5;
-//     transform: scale(1.02);
-//   }
-// `;
 
 const UserAppointmentContainer = styled.div`
   display: flex;

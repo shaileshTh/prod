@@ -12,12 +12,20 @@ import { AccountContext } from "../../accountBox/accountContext";
 import { useHistory } from "react-router-dom";
 import Alert from 'react-bootstrap/Alert'
 import { Container, Col } from 'react-grid';
+import Collapse from 'react-bootstrap/Collapse'
+import ListGroup from 'react-bootstrap/ListGroup'
+import Badge from 'react-bootstrap/Badge'
+import Button from 'react-bootstrap/Button'
+
+let set = new Set();
+let index;
 
 
 export function EditProfile(props) {
     const [email, setEmail] = useState('Not logged in');
     const [userID, setUserID] = useState();
     const [fullName, setFullName] = useState();
+    // const [newName, setNewName] = useState();
     const [dob, setDoB] = useState();
     const [height, setHeight] = useState(); 
     const [weight, setWeight] = useState(); 
@@ -27,6 +35,12 @@ export function EditProfile(props) {
     const [insurance, setIns] = useState(); 
     const [groupNo, setGroupNo] = useState(); 
     const [policyHolder, setPolicyHolder] = useState(); 
+    // const [chooseDoctor, setChooseDoctor] = useState();
+    const [doctorList, setDoctorList] = useState([])
+    const [openDoctor, setOpenDoctor] = useState(false);
+    const [show, setShow] = useState(false);
+    const [prefDocPlaceHolder, setPrefDocPlaceHolder] = useState();
+    const history = useHistory(); 
     
 
     useEffect(() => {
@@ -47,6 +61,12 @@ export function EditProfile(props) {
                 setIns(response.data.insurance);
                 setGroupNo(response.data.groupId);
                 setPolicyHolder(response.data.insurance_policy_holder);
+                if (response.data.preferred_doc) {
+                    setPrefDocPlaceHolder(response.data.preferred_doc);
+                } else {
+                    setPrefDocPlaceHolder("No Provider Selected");
+                }
+                // setNewName(response.data.full_name)
     
 
             })
@@ -55,15 +75,39 @@ export function EditProfile(props) {
             })
 
     }, [])
+    useEffect(() => {
+        axios.defaults.withCredentials = true;
+        axios
+        .get("http://localhost:3001/all-users")
+        .then((response) =>{
+            let arr = [];
+            response.data.forEach((element) => {
+                if(!set.has(element.user_id)&&(element.user_type === 'doctor')){
+                    arr.push({
+                        user_id : element.user_id,
+                        full_name: element.full_name,
+                        email: element.email,
+                        user_type: element.user_type
+                    })
+                }
+            })
+            setDoctorList(arr);
+            console.log(doctorList)
+        })
+    }, [])
+
+    useEffect(() => {
+        document.title = "Edit Your Profile";  
+      }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
         axios
         .put(
-          `https://ksu-project-be.herokuapp.com/profile/${userID}`,
+          `https://ksu-project-be.herokuapp.com/user/profile/${userID}`,
           {
-            full_name: fullName,
+            // full_name: newName,
             birthdate: dob,
             height: height,
             weight: weight,
@@ -85,6 +129,7 @@ export function EditProfile(props) {
           alert("Profile Edited");
 
           window.location.reload(true);
+          history.goBack();
           
         })
         .catch(function (error) {
@@ -92,9 +137,32 @@ export function EditProfile(props) {
           alert("Error")
         });
     }
+    const handleClickDoctor = (e) => {
+        let targetIndex;
+        if (e.target.id === "") targetIndex = e.target.parentElement.id;
+        if (parseInt(e.target.id) > 19) targetIndex = e.target.parentElement.parentElement.id;
+        else targetIndex = e.target.id;
+        // setChooseDoctor(targetIndex)
+        console.log("DOCTOR LIST");
+        console.log(doctorList);
+        console.log("TARGET INDEX" + String(targetIndex));
+        console.log((doctorList[targetIndex]));
+        var docTemp = doctorList[targetIndex];
+        console.log(docTemp.full_name);
+        var docName = docTemp.full_name;
+        console.log(docName);
+        setDoc(docName);
+        // console.log(doc); 
+        setPrefDocPlaceHolder(docName);
+        // console.log('---' + userList[targetIndex].full_name)
+        setTimeout(()=>{
+            setShow(true);
+        },100)
+    }
+    index = -1
 
     return (<>
-        <NavBar email={fullName + "   :    " + email} />
+        <NavBar email={fullName} />
         <PageContainer>
         <div className="page-content page-container" id="page-content">
         <Container
@@ -111,15 +179,15 @@ export function EditProfile(props) {
             <Container
                 align="center"
             >
-            <FormContainer onSubmit = {e => {}}>
+            <FormContainer onSubmit = {e => {handleSubmit(e)}}>
                 <Col >
                 <div className="col-sm-8 justify-content-center text-center">
                         <h1 className="m-b-20 p-b-5 b-b-default f-w-600">Personal Information</h1>
                         <div className="row">
-                            <div className="col-sm-6">
+                            {/* <div className="col-sm-6">
                                 <p className="m-b-10 f-w-600">Name</p>
-                                <Input type ="text" name= "txt" placeholder={fullName} disabled/>
-                            </div>
+                                <Input type ="text" name= "txt" placeholder={newName} disabled/>
+                            </div> */}
                             <div className ="col-sm-6">
                                 <p className="m-b-10 f-w-600">Email</p>
                                 <Input type="email" name="email" placeholder={email}
@@ -143,6 +211,60 @@ export function EditProfile(props) {
                                     onChange = {e => setAllergy(e.target.value)}/>
                             </div>
                         </div>
+                        <h1 className="m-b-20 m-t-40 p-b-5 b-b-default f-w-600">Prefered Provider</h1>
+                        <Container align="center">
+                        <div className="col-sm-6">
+                            {prefDocPlaceHolder}
+                        </div>
+                        <div className="card-block justify-content-center ">
+                        {/* <div className="col-sm-8 justify-content-center text-center"> */}
+                        {/* <div className="row">    */}
+                        {/* <div className="col-sm-8 justify-content-center text-center"> */}
+                        {/* <Col> */}
+                            <div className="col-sm-6 justify-content-center ">                
+                            <Button 
+            onClick={() => setOpenDoctor(!openDoctor)}
+            aria-controls="collapse"
+            aria-expanded={openDoctor}
+            style = {{margin:'0 auto', display:'block'}}>
+            {(openDoctor) ? 'Collapse List' : 'Select Doctor' }</Button>
+            </div>
+            <br/>
+            {(openDoctor) ? <small style = {{margin: '-15px auto 8px auto', fontSize: 'large', display:'block', width:'fit-content'}}>
+                Select a provider:</small> : <></>}
+        <Collapse in={openDoctor}>
+            <div id="collapse">
+            <ListGroup as="ol" numbered>
+                {doctorList.map((user) => {
+                    index++;
+                    return(
+                    <ListGroup.Item
+                        key = {index}
+                        id = {index}
+                        action
+                        as="li"
+                        onClick = {(e)=>handleClickDoctor(e)}
+                        className="d-flex justify-content-between align-items-start"
+                    >
+                        <div className="ms-2 me-auto">
+                        <div className="fw-bold" id = {user.user_id}>{user.full_name}</div>
+                        {user.email}
+                        </div>
+                        <Badge bg="primary" pill>
+                        {user.user_type} #{user.user_id}
+                        </Badge>
+                    </ListGroup.Item>
+                    )
+                })}
+
+            </ListGroup>
+            </div>
+        </Collapse>
+        {/* </Col> */}
+                            </div>
+                            {/* </div> */}
+                        {/* </div> */}
+                        </Container>
                         <h1 className="m-b-20 m-t-40 p-b-5 b-b-default f-w-600">Insurance</h1>
                         <div className="row">
                             <div className="col-sm-6">
@@ -163,8 +285,10 @@ export function EditProfile(props) {
                         </div>
                     </div>
                     <div className="col-sm-8">
+                    <div className="col-sm-8 justify-content-center text-center">
                     <div className="card-block text-center">
                     <SubmitButton type="submit">Submit</SubmitButton>
+                    </div>
                     </div>
                     </div>
                     

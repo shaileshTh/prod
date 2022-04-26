@@ -17,6 +17,7 @@ import Badge from 'react-bootstrap/Badge'
 import database from '../../Firebase'
 import { ref, onValue, set } from "firebase/database";
 
+import Alert from 'react-bootstrap/Alert'
 
 let index
 let messageArr = [];
@@ -32,14 +33,18 @@ export function EmpChat(props){
 
     const [fetched, setFetched] = useState(false);
     const [email, setEmail] = useState("Not logged in");
+    const [patients, setPatients] = useState([])
     const [userID, setUserID] = useState(-1);
     const [allMessages, setAllMessages] = useState([])
     const [loading, setLoading] = useState(true);
     const [fullName, setFullName] = useState();
+    const [isDoctor, setIsDoctor] = useState(false)
     const [mapDone, setMapDone] = useState(false);
     const [userList, setUserList] = useState([])
     const [show, setShow] = useState(false);
+    const [showDocModal, setShowDocModal] = useState(false);
     const[composeTo, setComposeTo] = useState();
+    const[composeToPatient, setComposeToPatient] = useState();
     const [open, setOpen] = useState(false);
 
     useEffect(() => {
@@ -75,7 +80,6 @@ export function EmpChat(props){
                 }
             })
             setUserList(arr);
-            console.log(userList)
         })
     }, [])
     useEffect(() => {
@@ -87,10 +91,26 @@ export function EmpChat(props){
             setEmail(response.data.email);
             setUserID(response.data.user_id);
             setFullName(response.data.full_name);
+            if(response.data.user_type === 'doctor') setIsDoctor(true)
         }).catch((err) => {
             console.log("CHP/index.jsx" + err);
         });
-    }, [userID])
+
+        if(isDoctor){
+            axios.post('http://localhost:3001/get-patients-by-docId', 
+            {
+              "doctor_id" : userID
+            },{ 
+              withCredentials: true 
+            })
+                .then((response) => {
+                    setPatients(response.data)
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+        }
+    }, [userID, isDoctor])
     useEffect(() => {
         axios
             .get("https://ksu-project-be.herokuapp.com/messaging")
@@ -126,19 +146,41 @@ export function EmpChat(props){
             
     }, [fetched, userID, mapDone]);
 
+    useEffect(() => {
+        document.title = "Chat";  
+      }, []);
+
     const handleClick = (e) => {
         let targetIndex;
         if (e.target.id === "") targetIndex = e.target.parentElement.id;
         else targetIndex = e.target.id;
         setComposeTo(targetIndex)
-        // console.log('---' + userList[targetIndex].full_name)
         setTimeout(()=>{
             setShow(true);
         },100)
     }
+    const handleClickPatients = (e) => {
+        let index;
+        if (e.target.id === "") index = e.target.parentElement.id;
+        else index = e.target.id;
+        if(activeUsers.includes(parseInt(index))){
+            window.alert("Conversation with the selected user is already open. Please find it below.")
+        }else{
+            setComposeToPatient(index)
+            setTimeout(()=>{
+                setShowDocModal(true);
+            },100)
+        }
+    }
+    
     const handleClose = () => {
         setShow(false);
       };
+
+    const handleCloseDocModal = () => {
+        setShowDocModal(false);
+    };
+
 
     const handleModalSubmit = (e) =>{
         e.preventDefault();
@@ -154,7 +196,19 @@ export function EmpChat(props){
             message: e.target[0].value
          }).then(e.target[0].value = "").then(setShow(false))
          .catch(err => console.log(err))
-         setTimeout(()=>setFetched(false), 100)
+         window.location.reload(true);
+    }
+    const handleModalSubmitPatient = (e) =>{
+        e.preventDefault();
+       axios
+        .post("https://ksu-project-be.herokuapp.com/messaging", 
+        { 
+            sender_id: userID,
+            recipient_id: composeToPatient,
+            message: e.target[0].value
+         }).then(e.target[0].value = "").then(setShowDocModal(false))
+         .catch(err => console.log(err))
+         window.location.reload(true);
     }
     const handleSubmit = (e) =>{
         e.preventDefault();
@@ -179,6 +233,39 @@ export function EmpChat(props){
         <>
         <EmpNavBar email={fullName} />
         <h1 className="text-center mb-3 mt-4">{fullName}'s Message Portal</h1>
+        {(isDoctor) ? <ListGroup as="ol" numbered style = {{maxWidth: '500px', margin: '0 auto'}}>
+        {(isDoctor && patients.length === 0) ? 
+        <Alert variant="danger">
+        <Alert.Heading>No patients found!</Alert.Heading>
+            <p>
+            Please contact your nurse to put your patients into the system.
+            </p>
+        </Alert>
+        : <></>}
+        {(isDoctor && patients.length !== 0) ? <small style = {{margin: '-15px auto 8px auto', fontSize: 'large', display:'block', width:'fit-content'}}>Start a conversation with your patients:</small> : <></>}
+          {patients.map((user) => {
+              return(
+              <ListGroup.Item
+                  key = {user.user_id}
+                  id = {user.user_id}
+                  action
+                  as="li"
+                  onClick = {(e)=>handleClickPatients(e)}
+                  className="d-flex justify-content-between align-items-start"
+              >
+                  <div className="ms-2 me-auto">
+                  <div className="fw-bold" id = {user.user_id}>{user.full_name}</div>
+                  {user.email}
+                  </div>
+                  <Badge bg="primary" pill>
+                  {user.user_type} #{user.user_id}
+                  </Badge>
+                  </ListGroup.Item>
+                    )
+                })}
+            </ListGroup>
+        :
+        <>
         <Button 
             onClick={() => setOpen(!open)}
             aria-controls="collapse"
@@ -216,9 +303,15 @@ export function EmpChat(props){
             </ListGroup>
             </div>
         </Collapse>
+        </>
+        }
+        <br/>
         <hr style = {{width:'500px', margin:'0 auto'}}/>
         <br/>
-        {(activeUsers.length === 0) ? <h2 style = {{textAlign: 'center'}}>Click above to start a conversation!</h2>
+        {/* {(isDoctor && patients.length === 0) */}
+        {(activeUsers.length === 0) ? <h2 style = {{textAlign: 'center'}}>
+        {(isDoctor && patients.length !== 0) ? <>Click above to start a conversation!</> : <></>}
+            </h2>
         : 
         <small style = {{margin: '-15px auto 8px auto', fontSize: 'large', display:'block', width:'fit-content'}}>Open conversations:</small>
         }
@@ -260,6 +353,24 @@ export function EmpChat(props){
             <Modal.Body>
                 {(userList[composeTo] !== undefined) ? <h3>Say Hi to {userList[composeTo].full_name}</h3> : <></>}
                  <form onSubmit = {(e) => handleModalSubmit(e)}>
+                <InputGroup style = {{'bottom': '-17px'}} className="mb-3">
+                    <FormControl
+                    placeholder="Type your message.."
+                    />
+                    <Button type = "submit" variant="outline-secondary" id="button-addon2">
+                    Send
+                    </Button>
+                </InputGroup>
+                </form>
+            </Modal.Body>
+        </Modal>
+        <Modal show={showDocModal} onHide={handleCloseDocModal}>
+            <Modal.Header closeButton>
+                <Modal.Title>New Message</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {(composeToPatient !== undefined) ? <h3>Say Hi to patient #{composeToPatient}</h3> : <></>}
+                 <form onSubmit = {(e) => handleModalSubmitPatient(e)}>
                 <InputGroup style = {{'bottom': '-17px'}} className="mb-3">
                     <FormControl
                     placeholder="Type your message.."

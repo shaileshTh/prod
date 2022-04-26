@@ -26,29 +26,38 @@ import Button from 'react-bootstrap/Button'
 // JWT_TOK = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOm51bGwsImlzcyI6Im1ydms0NDZJUmh5YzZkRkZ4T29PZlEiLCJleHAiOjE2NDY3OTgyNTMsImlhdCI6MTY0Njc5Mjg1M30.V6fpiEXIlAiNRWzK5n0CA1a2rhKtZvQbkQdZQ6RSyBo'
 
 let index;
-let messageArr = [];
 let set = new Set();
-let activeUsers = [];
-let nameMap = new Map();
-
+var dateTime = new Date();
+var zoom1 = "https://us04web.zoom.us/j/3839197009?pwd=O5yDRmWmm9QnV64e_bnzUZr4_pcLlG.1";
+// This is Nate's personal zoom
+var zoom2 = "https://us05web.zoom.us/j/3481873040?pwd=eVp2ZDI5MEdwS2NZc25BN0xBTGNNQT09";
+// Email ksudoctorone@gmail.com
+// Password Doctor123
 
 
 
 export function EmpVideoCall(props) {
     const [email, setEmail] = useState('Not logged in');
-    const [joinMeeting, setJoinMeeting] = useState(false);
+    //const [joinMeeting, setJoinMeeting] = useState(false);
     // const [email, setEmail] = useState('Not logged in');
+    const [userFullName, setUserFullName] = useState(null);
     const [userList, setUserList] = useState([])
     const [show, setShow] = useState(false);
     const[composeTo, setComposeTo] = useState('');
     const [open, setOpen] = useState(false);
+    const [curTime, setCurTime] = useState();
+    const [curDate, setCurDate] = useState();
+    const [zoomLink, setZoomLink] = useState();
+    const [checked, setChecked] = useState(false);
+
     useEffect(() => {
         axios.defaults.withCredentials = true;
 
         axios.post('https://ksu-project-be.herokuapp.com/me', { withCredentials: true })
             .then((response) => {
                 console.log(response.data)
-                setEmail(response.data.full_name)
+                setEmail(response.data.email)
+                setUserFullName(response.data.full_name)
             })
             .catch((err) => {
                 console.log("CHP/index.jsx" + err);
@@ -75,8 +84,27 @@ export function EmpVideoCall(props) {
                 console.log(arr)
         })
 
-    }, [])
+    }, [],
+    useEffect(() => {
+        setCurTime(dateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
+        setCurDate(dateTime.toLocaleDateString());
+    }),
+    )
+
+    useEffect(() => {
+        document.title = "Video Call";  
+      }, []);
     
+    useEffect(() => {
+        if (email === "doctor@doctor") {
+            setZoomLink(zoom1);
+            console.log("zoom1");
+        } else {
+            setZoomLink(zoom2);
+            console.log("zoom2");
+        }
+    })
+
     const handleClick = (e) => {
         let targetIndex;
         if (e.target.id === "") targetIndex = e.target.parentElement.id;
@@ -87,11 +115,23 @@ export function EmpVideoCall(props) {
             setShow(true);
         },100)
     }
+    const handleCheck = () => {
+        setChecked(!checked);
+    }
+    
+    const joinMeeting = () => {
+        // console.log(zoomLink)
+        if (composeTo) {
+            window.location.href = zoomLink;
+        } else {
+            alert("Please select your patient");
+        }
+    }
 
     index = -1
 
     return (<>
-        <EmpNavBar email={email} />
+        <EmpNavBar email={userFullName} />
         <PageContainer>
             <div className="card-block text-center">
                 <div className="m-b-25"> <img src={zoomIcon} alt="zoom icon" className="img-radius" /> </div>
@@ -138,23 +178,17 @@ export function EmpVideoCall(props) {
                 </div>
                 <div>
                     <p className="m-b-10 f-w-600">Time</p>
-                    <h6 className="text-muted f-w-400">12:00 PM</h6>
+                    <h6 className="text-muted f-w-400">{curTime}</h6>
                 </div>
                 <div>
                     <p className="m-b-10 f-w-600">Date</p>
-                    <h6 className="text-muted f-w-400">mm/dd/yyyy</h6>
+                    <h6 className="text-muted f-w-400">{curDate}</h6>
                 </div>
                 
-                <div className="zoomDiv" >
-                    {joinMeeting ? (
-                        <Zoom />
-                    ) : (
-                        // <button style = {{border: '2px solid #abc'}} onClick={() => setJoinMeeting(true)}>Join Meeting</button>
-                        <a id="Join meeting" href="https://us04web.zoom.us/j/77685262436?pwd=I0qcN5jBMhT-sdQT0d9nVVS5kYbOwu.1">Join Call</a>
-                    )}
-                </div>
-               
-                {/* <button className="btn btn-primary" type="submit">Launch Meeting</button> */}
+                <div> <label>
+                    <input type="checkbox" checked={checked} onChange={handleCheck}/> By checking this box, you agree to the company's Privacy Policy for electronic health care.<div>Recording a session must be agreed by all participants.</div>
+                </label></div>
+                {(checked) ? <button class="btn btn-primary" type="submit" onClick={joinMeeting}>Join Call</button> : <div></div>}
             </div>
         </PageContainer>
     </>

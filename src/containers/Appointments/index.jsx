@@ -1,45 +1,80 @@
 import React from "react";
 import { PageContainer } from "../../components/pageContainer";
 import { NavBar } from "../../components/navbar";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
-// import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
-import { Button, Modal } from "react-bootstrap";
-import ScheduleSelector from "react-schedule-selector";
+import parse from 'html-react-parser';
+import { Scheduler, DayView } from "@progress/kendo-react-scheduler";
+import {  guid } from "@progress/kendo-react-common";
+
+var zoom1 = "https://us04web.zoom.us/j/3839197009?pwd=O5yDRmWmm9QnV64e_bnzUZr4_pcLlG.1";
+// This is Nate's personal zoom
+var zoom2 = "https://us05web.zoom.us/j/3481873040?pwd=eVp2ZDI5MEdwS2NZc25BN0xBTGNNQT09";
+// Email ksudoctorone@gmail.com
+// Password Doctor123
 
 export function Appointments(props) {
   const [email, setEmail] = useState("Not logged in");
   const [userID, setUserID] = useState(null);
   const [userFullName, setUserFullName] = useState(null);
-  const [userAppointment, setUserAppointment] = useState(null);
-  const [show, setShow] = useState(false);
-  const [doctorList, setDoctorList] = useState(null);
+  const [assignedDocName, setAssignedDocName] = useState();
+  const [userAppointment, setUserAppointment] = useState([]);
+  const [assignedDoctor, setAssignedDoctor] = useState("");
+  const [allAppointment, setAllAppointment] = useState([]);
+  const displayDate = new Date(new Date().toISOString());
   let doctors = [];
 
-  const handleClose = () => {
-    setShow(false);
-  };
-  const handleShow = () => {
-    setShow(true);
-  };
 
   useEffect(() => {
     axios.defaults.withCredentials = true;
+    let arr = [];
 
     axios
       .post("https://ksu-project-be.herokuapp.com/me", { withCredentials: true })
       .then((response) => {
-        console.log(response.data);
-        setEmail(response.data.full_name);
+        setEmail(response.data.email);
         setUserID(response.data.user_id);
         setUserFullName(response.data.full_name);
         setUserAppointment(response.data.userAppointment);
-        getSchedule();
+        setAssignedDoctor(response.data.assigned_doctor_id);
+        // getSchedule();
+
+        //Retrive appt schedule
+        if(response.data.userAppointment.length != 0){
+          response.data.userAppointment.forEach((appt) => {
+            let start = new Date(appt.start);
+            let end = new Date(appt.end)
+            let id = appt.id;
+            let description= appt.description;
+            let title = appt.title;
+
+            arr.push({
+              id: id,
+              title: parse(`<h5>${title}</h5>`),
+              description: description,
+              start: start,
+              end: end,
+            })
+          })
+          setAllAppointment(arr);
+        }
+
       })
       .catch((err) => {
         console.log("customer homepage index.jsx" + err);
       });
+
+      if(assignedDoctor){
+        axios.get(`http://localhost:3001/user/find/${assignedDoctor}`, { withCredentials: true })
+        .then((response) => {
+          console.log(response)
+            setAssignedDocName(response.data[0].full_name)
+        }).catch((err) => {
+            console.log("CHP/index.jsx" + err);
+        });
+    }
+
     axios
       .get("https://ksu-project-be.herokuapp.com/user/findAll")
       .then((response) => {
@@ -48,373 +83,134 @@ export function Appointments(props) {
             doctors.push({ id: element.user_id, name: element.full_name });
           }
         });
-        setDoctorList(doctors);
+        // setDoctorList(doctors);
       })
       .catch((err) => {
         console.log("customer homepage index.jsx" + err);
       });
+  }, [assignedDoctor]);
+  useEffect(() => {
+    document.title = "Appointments";  
   }, []);
-
-  // let history = useHistory();
-  const [err, setError] = useState(false);
-  const [message, setMessage] = useState("");
-  const [date, setDate] = useState(null);
-  const [reason, setReason] = useState(null);
-  const [doctor, setDoctor] = useState(null);
-
-
+  
   /**
-   * Handles user submitting an appointment.
+   * Intake for Scheduler
+   * @param {created} param0 
    */
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleDataChange = ({ created }) =>{
+    //add UNCONFIRM postfix to appt title.
+    created[created.length-1].title += " -UNCONFIRMED"
+    let genID= guid();
+    // console.log("guid is: ", genID)
+    // console.log("created: ", created)
+    setAllAppointment((old) =>
+      old.concat( // Add the newly created items and assign an `id`.
+          created.map((item) =>
+            Object.assign({}, item, {
+              id: genID,
+            })
+          )
+        )
+    );
 
-    // Return if use try to make appointment without a doctor choosed.
-    if(selectedDoctorID === null){
-      alert("Please Select A Doctor.");
-      return;
-    }
+    bookAppt({created, genID});
+    window.location.reload();
+  }
+  /**
+   * HandleChange for Scheduler
+   */
+  const bookAppt = ({created, genID}) =>{
+    let apptDate = new Date(created[0].start).toISOString().split("T")[0];
+    let start = new Date(created[0].start).toString();
+    let end = new Date(created[0].end).toString();
+    let description = created[0].description;
+    let id= genID;
+    let title = created[0].title;
     //Current date time.
     let dateTime = new Date().toLocaleString();
-    console.log("dateTime: ", dateTime);
+    // console.log("dateTime: ", dateTime);
 
     axios
-      .post(
-        "https://ksu-project-be.herokuapp.com/appointment",
-        {
-          appt_date: date,
-          appt_start: datetime,
-          reason: reason,
-          patient_id: userID,
-          doctor_id: selectedDoctorID,
-          date_time: dateTime,
-          patient_name: userFullName,
-          doctor_name: selectedDoctorName,
+    .post(
+      "https://ksu-project-be.herokuapp.com/appointment",
+      {
+        appt_date: apptDate,
+        start: start,
+        description: description,
+        patient_id: userID,
+        doctor_id: assignedDoctor,
+        date_time: dateTime,
+        patient_name: userFullName,
+        end: end,
+        id: id,
+        title, title,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
-      .then(function (response) {
-        // console.log("book appointment func: ",response);
-        alert("Appointment Booked");
-        updateSchedule(response.data);
-        window.location.reload(true);
-        // return false; //prevent refreshing page
-      })
-      .catch(function (error) {
-        setError(true);
-        console.log(error);
-        if (error.response) setMessage(error.response.data);
-        else setMessage("Something went wrong.");
-      });
-  };
-
-  /**
-   * Update doctor schedule after a appointment is made- disable the timeslot.
-   */
-  const updateSchedule=(data)=>{
-    console.log("inside updateschedule data is: ", data)
-    axios
-    .put("https://ksu-project-be.herokuapp.com/doctorAppTime/updateSchedule", {
-      data,
+        withCredentials: true,
+      }
+    )
+    .then(function (response) {
+      console.log("book appointment func: ",response.data);
+      // alert("Appointment Booked");
+      // updateSchedule(response.data);
+      // window.location.reload(true);
+      // return false; //prevent refreshing page
     })
-    .then((response) => {
-      console.log("updateScheudle then ")
-    })
-    .catch((err) => {
-      console.log("CHP/index.jsx" + err);
+    .catch(function (error) {
+      setError(true);
+      console.log(error);
+      if (error.response) setMessage(error.response.data);
+      else setMessage("Something went wrong.");
     });
   }
 
 
-  /**
-   * Schedule operation below.
-   */
-  const [schedule, setSchedule] = useState([]);
-  const [datetime, setDatetime] = useState(null);
-
-  //Get the selected schedule from database after
-  const getSchedule = () => {
-    axios
-      .post("https://ksu-project-be.herokuapp.com/doctorAppTime/mostRecent", {
-        doctorID: selectedDoctorID,
-      })
-      .then((response) => {
-        //Retrive timeslot from db.
-        const result = [
-          ...new Set([].concat(...response.data.map((o) => o.times))),
-        ];
-        //Set the current schedule to the schedule from db.
-        setSchedule(result);
-
-        // console.log("timeslot is: ", result);
-      })
-      .catch((err) => {
-        console.log("CHP/index.jsx" + err);
-      });
-  };
-
-  //Display avaiable time for the date selected in Modal.
-  let avaiableDate = []; //date not modify, ahead by 4 hour.
-  let timeToShow = []; //date modify, shows the correspond time.
-  var timestamp;
-
-  //When user choose a specific date, extract only the selected date from the whole timeslot.
-  //And modify the time to display correctly instead of ahead by 4 hours.
-  const dateValid = () => {
-    avaiableDate = schedule.filter((item) => item.includes(date));
-    // console.log("result is: ", result)
-    if (avaiableDate.length === 0) return false;
-    else {
-      for (let i = 0; i < avaiableDate.length; i++) {
-        timestamp = new Date(avaiableDate[i]);
-        timestamp.setHours(timestamp.getHours() - 4);
-        var timeToString = JSON.stringify(timestamp);
-        timeToShow.push(timeToString.substring(12, 20));
-      }
-      // console.log("timetoshow: ", timeToShow)
-      return true;
-    }
-  };
-
-  /**
-   * Get the doctor schedule from DB based on doctor selected.
-   * Will not run on first render, only make axios call when a doctor is selected.
-   */
-  const [selectedDoctorID, setSelectedDoctorID] = useState(null);
-  const [selectedDoctorName, setSelectedDoctorName] = useState(null);
-  const firstUpdate = useRef(true);
-  useEffect(() => {
-    if (firstUpdate.current) {
-      firstUpdate.current = false;
-      return;
-    }
-    axios
-      .post("https://ksu-project-be.herokuapp.com/doctorAppTime/mostRecent", {
-        doctorID: selectedDoctorID,
-      })
-      .then((response) => {
-        //Retrive timeslot from db.
-        const result = [
-          ...new Set([].concat(...response.data.map((o) => o.times))),
-        ];
-        //Set the current schedule to the schedule from db.
-        setSchedule(result);
-        // console.log("timeslot is: ", result);
-      })
-      .catch((err) => {
-        console.log("CHP/index.jsx" + err);
-      });
-  }, [selectedDoctorID]);
-
-  /**
-   * todatDate: display appointment only today and onward.
-   * Convert date from m/d/yyyy to yyyy/mm//dd
-   */
-  let todayDate = new Date().toLocaleString();
-  todayDate = todayDate.slice(4,8) + "-0" + todayDate.slice(0,1) + "-0" + todayDate.slice(2,3);
-
-
-  /**
-   * User canceling an appointment
-   */
-   let apptActionApptID;
-  const handleCancel = (e) =>{
-    const text = e.split(" ")[0]
-    apptActionApptID = e.split(" ")[1];
-
-    axios
-    .delete(`https://ksu-project-be.herokuapp.com/appointment/deleteAppt/${apptActionApptID}`)
-    .then((response) => {
-      reEnableDoctorSchedule(response.data[0]);
-      alert(`Appointment ID: ${response.data[0].appt_id} ${text} Successful`);
-      window.location.reload(true);
-    })
-    .catch((err) => {
-      console.log("CHP/index.jsx" + err);
-    });       
-  }
-  /**
-   * Reenable doctor schedule once the appointment has been reject or cancle by nurse.
-   */
-   const reEnableDoctorSchedule= (response)=>{
-    const doctorID = response.doctor_id;
-    const formatedTime = response.appt_date.split("T")[0] +"T"+ response.appt_start.split("+")[0];
-    const reEnableTime = new Date(`${formatedTime}`);
-
-    axios
-        .put("https://ksu-project-be.herokuapp.com/doctorAppTime/reEnableAvailability", {
-          newSchedule: reEnableTime,
-          id: doctorID,
-        })
-        .then((response) => {
-          // console.log("reEnableDoctorSchedule response: ", response.data)
-        })
-        .catch((err) => {
-          console.log("CHP/index.jsx" + err);
-        });
-
-  }
+  const [err, setError] = useState(false);
+  const [message, setMessage] = useState("");
 
   return (
     <>
-      <NavBar email={email} />
+      <NavBar email={userFullName} />
       <PageContainer>
-        <PseudoBorder> Available Timeslot:</PseudoBorder>
 
-        <Select
-          defaultValue
-          style={{ marginTop: "15px" }}
-          onChange={(e) => {setSelectedDoctorID(e.target.value.split("-")[0]); setSelectedDoctorName(e.target.value.split("-")[1])}}
-        >
-          <Option value="">Select A Doctor</Option>
-          {doctorList
-            ? doctorList.map((doctor) => (
-                <Option key={doctor.id} value={doctor.id +"-"+ doctor.name}>
-                  {doctor.name}
-                </Option>
-              ))
-            : null}
-        </Select>
-
-        <ScheduleSelector
-          // onChange={handleScheduleSelector}
-          selection={schedule}
-          numDays={5}
-          minTime={9}
-          maxTime={18}
-        />
-        {selectedDoctorID ? 
-        <Button variant="primary" onClick={handleShow}>
-          Make an Appointment
-        </Button> : null}
-        <PseudoBorder style={{ marginTop: "15px" }}>Appointments</PseudoBorder>
-
-        <UserAppointmentContainer>
-          <table className="table">
-            <thead>
-              <tr>
-                <th scope="col" style={{ width: "10vw" }}>
-                  Appointment ID
-                </th>
-                <th scope="col" style={{ width: "10vw" }}>
-                  Date
-                </th>
-                <th scope="col" style={{ width: "10vw" }}>
-                  Start
-                </th>
-                <th scope="col" style={{ width: "10vw" }}>
-                  Doctor
-                </th>
-                <th scope="col" style={{ width: "10vw" }}>
-                  Reason
-                </th>
-                <th scope="col" style={{ width: "10vw" }}>
-                  Confirmed
-                </th>
-                <th scope="col" style={{ width: "10vw" }}>
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {userAppointment
-                ? userAppointment.sort((a, b) => b.appt_start > a.appt_start ? 1: -1).sort((a, b) => b.appt_date < a.appt_date ? 1: -1).map((item) =>
-                    /*Shows appointment only today and onward */
-                    item.appt_date >= todayDate ? (
-                      <tr key = {item.appt_id}>
-                        <th scope="row">{item.appt_id}</th>
-                        <td>{item.appt_date.split("T")[0]}</td>
-                        <td>{item.appt_start.split("+")[0]}</td>
-                        <td>{item.doctor_name}</td>
-                        <td>{item.reason ? item.reason : "Not Specified"}</td>
-                        <td>{item.confirmed ? `TRUE` : `FALSE`}</td>
-                        <td >
-                        <Button variant="danger" value="Cancel" onClick={(e) => handleCancel(e.target.value + " " + item.appt_id)}>Cancel</Button>
-                        </td>
-                      </tr>
-                    ) : null
-                  )
-                : null}
-            </tbody>
-          </table>
-        </UserAppointmentContainer>
-
-        <Modal show={show} onHide={handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>New Appointment</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <FormContainer
-              onSubmit={(e) => {
-                handleSubmit(e);
-                handleClose();
-              }}
-              autoComplete="off"
+      {assignedDoctor ?
+        <>
+        <br/>
+          <PseudoBorder>Your doctor {assignedDocName}'s calendar:</PseudoBorder>
+          <br/>
+          <h3><i>Double click on timeslot to request an appointment:</i></h3>
+          <h3><i>You will get notified once the nurse confirms the appointment.</i></h3>
+          <br/>
+          <Scheduler 
+            style = {{maxWidth: '700px'}} 
+            data={allAppointment} 
+            onDataChange={handleDataChange}
+            defaultDate={displayDate} 
+            timezone="Etc/UTC"
+            editable={false}
             >
-              <Title style={{ marginTop: "30px" }}>
-                Reason for appointment:
-              </Title>
-              <ReasonInput
-                name="text"
-                onChange={(e) => {
-                  setReason(e.target.value);
-                }}
-              />
-              <Title style={{ marginTop: "20px" }}>Date and Time:</Title>
-
-              <Input
-                type="date"
-                id="appointment-time"
-                name="appointment-time"
-                min="2022-02-07T00:00"
-                max="2022-12-30T00:00"
-                style={{ padding: "5px" }}
-                onChange={(e) => {
-                  setDate(e.target.value);
-                }}
-              />
-              {date && dateValid() ? (
-                <Select
-                  onChange={(e) => {
-                    setDatetime(e.target.value);
-                  }}
-                >
-                  <Option value="">Select A Timeslot</Option>
-                  {timeToShow.sort((a, b) => b < a ? 1: -1).map((item) => (
-                    <Option key={item}>{item}</Option>
-                  ))}
-                </Select>
-              ) : (
-                <Select>
-                  <Option></Option>
-                </Select>
-              )}
-              {date == null ? (
-                <span className="d-inline-block">
-                  <Button
-                    disabled
-                    style={{
-                      pointerEvents: "none",
-                      width: "auto",
-                      marginTop: "30px",
-                    }}
-                  >
-                    Schedule
-                  </Button>
-                </span>
-              ) : (
-                <Button type="submit" style={{ width: "fit-content" }}>
-                  Schedule
-                </Button>
-              )}
-            </FormContainer>
-          </Modal.Body>
-        </Modal>
+            <DayView 
+              startTime={"08:00"}
+              endTime={"18:00"}
+              workDayStart={"08:00"}
+              workDayEnd={"18:00"}
+              slotDivisions={1}
+              editable={{
+                add: true,
+                remove: false,
+                drag: false,
+                resize: false,
+                edit: false,
+            }}
+            />
+          </Scheduler>
+        </>
+          : 
+          <h2 style={{textAlign: 'center', marginTop: '100px'}}>Doctor not assigned. Please contact us.</h2>
+          }
       </PageContainer>
     </>
   );
@@ -460,7 +256,7 @@ const ReasonInput = styled.textarea`
 
 const Select = styled.select`
   padding: 5px;
-  width: 150px;
+  width: 200px;
 `;
 
 const Option = styled.option``;

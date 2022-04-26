@@ -19,6 +19,8 @@ export function YourProfile(props) {
     const [insurance, setIns] = useState(); 
     const [groupNo, setGroupNo] = useState(); 
     const [policyHolder, setPolicyHolder] = useState(); 
+    const [assignedDocId, setAssignedDocId] = useState()
+    const [assignedDocName, setAssignedDocName] = useState()
     
 
     useEffect(() => {
@@ -38,16 +40,31 @@ export function YourProfile(props) {
                 setIns(response.data.insurance);
                 setGroupNo(response.data.groupId);
                 setPolicyHolder(response.data.insurance_policy_holder);
+                setAssignedDocId(response.data.assigned_doctor_id);
+                console.log("Prefered Doc");
+                console.log(String(doc));
     
 
             })
             .catch((err) => {
                 console.log("CHP/index.jsx" + err);
-            })
+            });
+            if(assignedDocId){
+                axios.get(`http://localhost:3001/user/find/${assignedDocId}`, { withCredentials: true })
+                .then((response) => {
+                    setAssignedDocName(response.data[0].full_name)
+                }).catch((err) => {
+                    console.log("CHP/index.jsx" + err);
+                });
+            }
     }, [])
 
+    useEffect(() => {
+        document.title = "Your Profile";  
+      }, []);
+
     return (<>
-        <NavBar email={fullName + "   :    " + email} />
+        <NavBar email={fullName} />
         <PageContainer>
             <div className="page-content page-container" id="page-content">
                 <div className="padding">
@@ -89,6 +106,10 @@ export function YourProfile(props) {
                                                 <div className="col-sm-6">
                                                     <p className="m-b-10 f-w-600">Preferred Provider</p>
                                                     <h6 className="text-muted f-w-400">{doc}</h6>
+                                                </div>
+                                                <div className="col-sm-6">
+                                                    <p className="m-b-10 f-w-600">Assigned Provider</p>
+                                                    <h6 className="text-muted f-w-400">{assignedDocName}</h6>
                                                 </div>
                                                 {/* <div className="col-sm-6">
                                                     <p className="m-b-10 f-w-600">Specialist</p>

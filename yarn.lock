@@ -1933,7 +1933,7 @@
   "resolved" "https://registry.npmjs.org/@progress/kendo-react-all/-/kendo-react-all-5.2.0.tgz"
   "version" "5.2.0"
 
-"@progress/kendo-react-animation@^5.0.0", "@progress/kendo-react-animation@5.2.0":
+"@progress/kendo-react-animation@^5.0.0", "@progress/kendo-react-animation@^5.2.0", "@progress/kendo-react-animation@5.2.0":
   "integrity" "sha512-ycdqUe6Ud7KxbP3b/+8+iQ0MHxX0W97sdZb+hIvm6ajJf5IZaCMGnmjnpBLFXB7MIS41V2mQmpDB0J+xFSj3+A=="
   "resolved" "https://registry.npmjs.org/@progress/kendo-react-animation/-/kendo-react-animation-5.2.0.tgz"
   "version" "5.2.0"

@@ -71,9 +71,7 @@ export function EmpNavBar(props) {
                 axios
                   .post("https://ksu-tm.herokuapp.com/logout")
                   .then((response) => {
-                    if (response.status === 200) {
-                      history.replace("/");
-                    }
+                    window.location.reload()
                   })
                   .catch((err) => {
                     console.log(err.response.data);

@@ -5,6 +5,7 @@
   "dependencies": {
     "@progress/kendo-date-math": "^1.5.6",
     "@progress/kendo-licensing": "^1.2.2",
+    "@progress/kendo-react-buttons": "^5.2.0",
     "@progress/kendo-react-common": "^5.2.0",
     "@progress/kendo-react-intl": "^5.2.0",
     "@progress/kendo-react-labels": "^5.2.0",

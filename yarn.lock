@@ -1874,7 +1874,7 @@
     "prop-types" "^15.6.0"
     "react-transition-group" "^4.4.2"
 
-"@progress/kendo-react-buttons@^5.0.0", "@progress/kendo-react-buttons@5.2.0":
+"@progress/kendo-react-buttons@^5.0.0", "@progress/kendo-react-buttons@^5.2.0", "@progress/kendo-react-buttons@5.2.0":
   "integrity" "sha512-hOGa4CeXpqxHjc7leNvykug1QDjCsQihfHUsBDzzmnYbL5Pl3hpY/KJC8Z/2hkMxVnVpjS+tsfJt5ZTJ3sDw3g=="
   "resolved" "https://registry.npmjs.org/@progress/kendo-react-buttons/-/kendo-react-buttons-5.2.0.tgz"
   "version" "5.2.0"

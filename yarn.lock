@@ -1984,7 +1984,7 @@
     "@progress/kendo-react-common" "5.2.0"
     "prop-types" "^15.6.0"
 
-"@progress/kendo-react-dateinputs@^5.0.0":
+"@progress/kendo-react-dateinputs@^5.0.0", "@progress/kendo-react-dateinputs@^5.2.0":
   "integrity" "sha512-HnZJ4HpbSjpdT4Pkp5Pcs1lz48B1v/aXaoDIJkxgP/n4L6a01c70ZhCHW+2YhGycwa8CnlMhqiLpGkjGCpHHKQ=="
   "resolved" "https://registry.npmjs.org/@progress/kendo-react-dateinputs/-/kendo-react-dateinputs-5.2.0.tgz"
   "version" "5.2.0"
@@ -2004,7 +2004,7 @@
     "@progress/kendo-react-common" "5.2.0"
     "prop-types" "^15.6.0"
 
-"@progress/kendo-react-dropdowns@^5.0.0":
+"@progress/kendo-react-dropdowns@^5.0.0", "@progress/kendo-react-dropdowns@^5.2.0":
   "integrity" "sha512-IceVbie4pL2Qpv/TuNE3AWJLTtDIfempTR3Be1ZvVZ0fRshXTho5zWA7gOyUVU25egEaLg+qvZ32pted4RJgjA=="
   "resolved" "https://registry.npmjs.org/@progress/kendo-react-dropdowns/-/kendo-react-dropdowns-5.2.0.tgz"
   "version" "5.2.0"
@@ -2073,7 +2073,7 @@
     "@progress/kendo-react-common" "5.2.0"
     "prop-types" "^15.6.0"
 
-"@progress/kendo-react-inputs@^5.0.0":
+"@progress/kendo-react-inputs@^5.0.0", "@progress/kendo-react-inputs@^5.2.0":
   "integrity" "sha512-TmCy/NSZl5WhH76mh7CsL1IYObvhST2cbXjaCWIezE1C+buuyJGzAgLuEE0253fgboadNJCD8Saiy8477gIMiw=="
   "resolved" "https://registry.npmjs.org/@progress/kendo-react-inputs/-/kendo-react-inputs-5.2.0.tgz"
   "version" "5.2.0"
@@ -2149,7 +2149,7 @@
     "@progress/kendo-react-common" "5.2.0"
     "prop-types" "^15.6.0"
 
-"@progress/kendo-react-popup@^5.0.0", "@progress/kendo-react-popup@5.2.0":
+"@progress/kendo-react-popup@^5.0.0", "@progress/kendo-react-popup@^5.2.0", "@progress/kendo-react-popup@5.2.0":
   "integrity" "sha512-SXj2cjWUnW7k8UA07Hpqcy304vdd72LHWol9BmS9MUJ9Pi+70vrNrIBiA9dr04i7oLss2L+G/dxO+7Qg7fAruA=="
   "resolved" "https://registry.npmjs.org/@progress/kendo-react-popup/-/kendo-react-popup-5.2.0.tgz"
   "version" "5.2.0"

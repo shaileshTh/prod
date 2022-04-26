@@ -39,6 +39,7 @@ export function NavBar(props){
                   }).catch((err) => {
                     console.log(err.response.data);
                   })
+                  window.location.reload()
                 }}>Sign Out</button>
             </Navbar.Text>
             </Navbar.Collapse>

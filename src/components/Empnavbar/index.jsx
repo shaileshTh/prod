@@ -76,6 +76,7 @@ export function EmpNavBar(props) {
                   .catch((err) => {
                     console.log(err.response.data);
                   });
+                window.location.reload()
               }}
             >
               Sign Out

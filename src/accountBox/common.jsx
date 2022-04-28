@@ -14,6 +14,13 @@ export const FormContainer = styled.form`
     flex-direction: column;
     //box-shadow: 0px 0px 2.5px rgba(15, 15, 15, 0.19);
 `;
+export const WhiteBoldLink = styled.a`
+    font-size: 14px;
+    color: #ffffff;
+    font-weight: 500;
+    text-decoration: none;
+    margin: 0 4px;
+`;
 
 export const MutedLink = styled.a`
     font-size: 12px;

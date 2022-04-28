@@ -42,6 +42,8 @@ export function Appointments(props) {
         setUserFullName(response.data.full_name);
         setUserAppointment(response.data.userAppointment);
         setAssignedDoctor(response.data.assigned_doctor_id);
+        console.log("Appointment Response");
+        console.log(response.data);
         // getSchedule();
 
         //Retrive appt schedule
@@ -51,11 +53,32 @@ export function Appointments(props) {
             let end = new Date(appt.end)
             let id = appt.id;
             let description= appt.description;
-            let title = appt.title;
+            let tempZoomLink = "";
+
+            if(assignedDoctor){
+              axios.get(`http://localhost:3001/user/find/${assignedDoctor}`, { withCredentials: true })
+              .then((response) => {
+                console.log(response)
+                  setAssignedDocName(response.data[0].full_name)
+              }).catch((err) => {
+                  console.log("CHP/index.jsx" + err);
+              });
+            }
+            if (appt.doctor_id === 21) {
+              tempZoomLink = zoom1;
+              console.log("zoom1");
+            } else {
+              tempZoomLink = zoom2
+              console.log("zoom2");
+            }
+            let title = parse(`<h5>${appt.title}</h5>`)
+            if (appt.confirmed) {
+              title = parse(`<h5><a href = ${tempZoomLink} style = "color:white;"><i>Click to join </i><b>${appt.title}</b></a></h5>`);}
+
 
             arr.push({
               id: id,
-              title: parse(`<h5>${title}</h5>`),
+              title: title,
               description: description,
               start: start,
               end: end,
@@ -69,16 +92,6 @@ export function Appointments(props) {
         history.goBack();
         console.log(" index.jsx" + err);
       });
-
-      if(assignedDoctor){
-        axios.get(`https://ksu-tm.herokuapp.com/user/find/${assignedDoctor}`, { withCredentials: true })
-        .then((response) => {
-          console.log(response)
-            setAssignedDocName(response.data[0].full_name)
-        }).catch((err) => {
-            console.log("CHP/index.jsx" + err);
-        });
-    }
 
     axios
       .get("https://ksu-tm.herokuapp.com/user/findAll")
@@ -184,7 +197,7 @@ export function Appointments(props) {
       {assignedDoctor ?
         <>
         <br/>
-          <PseudoBorder>Your doctor {assignedDocName}'s calendar:</PseudoBorder>
+          <PseudoBorder>{assignedDocName}'s calendar:</PseudoBorder>
           <br/>
           <h3><i>Double click on timeslot to request an appointment:</i></h3>
           <h3><i>You will get notified once the nurse confirms the appointment.</i></h3>

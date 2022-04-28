@@ -4,11 +4,13 @@ import { Marginer } from "../components/marginer"
 import { AccountContext } from "./accountContext";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import Alert from 'react-bootstrap/Alert'
+import Alert from 'react-bootstrap/Alert';
+
 
 export function SignUpForm(props){
     const { switchToLogin } = useContext(AccountContext);
     const[name, setName] = useState('');
+    const[phone, setPhone] = useState(null);
     const[email, setEmail] = useState('');
     const[password, setPassword] = useState('');
     const[err, setError] = useState(false);
@@ -23,6 +25,7 @@ export function SignUpForm(props){
         axios.post('https://ksu-tm.herokuapp.com/register', {
             full_name: name,
             email : email,
+            mobile_number: phone,
             password: password,
             user_type: selects
           })
@@ -56,12 +59,12 @@ export function SignUpForm(props){
                 onChange = {e => setEmail(e.target.value)}/>
             <Input type ="date" name="DOB" placeholder="Date Of Birth mm/dd/yyyy"/>
             <Input type ="password" name="password" placeholder="Password" onChange = {e => setPassword(e.target.value)}/>
+            <Input type ="text" name="txt" placeholder="Enter phone number" onChange = {e => setPhone(e.target.value)}/>
             <Marginer direction="vertical" margin="1.6em" />
             {err ? <Alert variant = "danger">{message}</Alert> : <></>}
             <SubmitButton type="submit">Register</SubmitButton>
             <Marginer direction="vertical" margin="1em" />
         </FormContainer>
-        
         <small>Already have an account?<BoldLink href ="#" onClick={switchToLogin}>Login</BoldLink></small>
         <Marginer direction="vertical" margin="1em" />
     </BoxContainer>

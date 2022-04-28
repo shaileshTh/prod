@@ -7,11 +7,18 @@ import styled from "styled-components";
 import axios from "axios";
 import './style.css';
 import { Scheduler, DayView } from "@progress/kendo-react-scheduler";
+import Carousel from "react-multi-carousel";
+import 'react-multi-carousel/lib/styles.css';
+import './style.css';
+import accountIcon from "../../images/account.png";
+import { Form, FormControl } from "react-bootstrap";
+import  Alert  from "react-bootstrap/Alert";
 
 export function NurseAppointments(props) {
   const [email, setEmail] = useState("Not logged in");
   const [userID, setUserID] = useState(null);
   const [allAppointment, setAllAppointment] = useState([]);
+  const [chosen, setChosen] = useState(false)
   const [doctorList, setDoctorList] = useState(null);
   const [userFullName, setUserFullName] = useState(null);
   const [selectedDoctorID, setSelectedDoctorID] = useState(null);
@@ -105,13 +112,17 @@ const showAppt= (response) =>{
  * @param {updated} param0 
  */
 const updateApptConfirm = ({updated})=>{
+  let textTitle = "";
+  let textDate = "";
   axios
     .put('https://ksu-tm.herokuapp.com/appointment/nurseUpdateAppt', {
       id: updated[0].id,
       title: updated[0].title,
     })
     .then((response) => {
-      // console.log("updateApptConfirm response: ", response.data)
+      console.log("updateApptConfirm response: ", response.data)
+      textTitle = response.data[0].title;
+      textDate =  response.data[0].appt_date;
       setAllAppointment((old) =>
       old // Find and replace the updated items
         .map(
@@ -120,6 +131,11 @@ const updateApptConfirm = ({updated})=>{
             ) || item
         )
     );
+    axios
+        .post("http://localhost:3001/send-sms", {  phone_number: "7706332309", text_content: `Your appointment ${textTitle} sheduled for ${textDate} has been confirmed.`})
+        .catch((err) => {
+          console.log("CHP/index.jsx" + err);
+        });
     })
     .catch((err) => {
       console.log("CHP/index.jsx" + err);
@@ -150,6 +166,54 @@ const deleteApptConfirm = ({deleted})=>{
     });
 }
 
+const textInput = useRef(null);
+  const [listDoctor, setListDoctor] = useState([]);
+  const [nameDoctor, setNameDoctor] = useState('');
+
+  const responsive = {
+    superLargeDesktop: {
+      breakpoint: { max: 4000, min: 3000 },
+      items: 5,
+      slidesToSlide: 5
+    },
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 5,
+      slidesToSlide: 5
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 390 },
+      items: 3,
+      slidesToSlide: 3
+    },
+    mobile: {
+      breakpoint: { max: 390, min: 0 },
+      items: 1,
+      slidesToSlide: 1
+    }
+  };
+
+  const searchDoctor = (event) => {
+    event.preventDefault()
+    const doctorName = textInput.current.value
+    axios
+      .post("http://localhost:3001/doctorAppTime/searchDoctor", {
+        doctorName: doctorName,
+      })
+      .then((response) => {
+        setListDoctor(response.data);
+      })
+      .catch((err) => {
+        console.log("CHP/index.jsx" + err);
+      });
+  };
+
+  const imageClick = (e) => {
+    setChosen(true)
+    setNameDoctor(e.item.full_name);
+    setSelectedDoctorID(e.item.user_id);
+  }
+
 
 return (
     <>
@@ -158,22 +222,30 @@ return (
       <br/>
       <PseudoBorder>Manage Appointments:</PseudoBorder>
       <br/>
-      <h4>To Confirm: <i>Double click the appointment block to remove '-UNCONFIRMED' tag.</i></h4>
-      <h4>To Reject: <i>Click the 'x' on the top right corner of appointment block</i></h4>
-      <Select
-          defaultValue
-          style={{ margin: "20px" }}
-          onChange={(e) => setSelectedDoctorID(e.target.value)}
-        >
-          <Option value="">Select A Doctor</Option>
-          {doctorList
-            ? doctorList.map((doctor) => (
-                <Option key={doctor.user_id} value={doctor.user_id}>
-                  {doctor.full_name}
-                </Option>
-              ))
-            : null}
-        </Select>
+      <div style = {{maxWidth: '700px'}}>
+      <Alert style = {{width: 'auto'}}variant = "info">
+      <b>To Confirm: </b>Double click the appointment block to remove '-UNCONFIRMED' tag. <br/>
+      <b>To Reject: </b>Click the 'x' on the top right corner of appointment block
+      </Alert></div>
+      <Form className="d-flex m-2">
+        <FormControl type="search" onChange={searchDoctor} placeholder="Search a doctor..." className="me-2" aria-label="Search" ref={textInput} style={{position: "relative"}}/>
+      </Form>
+      <div className="col-xs-12 cardcont nopadding">
+        <div className="wrapper">
+          {(listDoctor.length!== 0) && <h3>Select a doctor:</h3>}
+          <Carousel responsive={responsive} autoPlay={false} shouldResetAutoplay={false}>
+            {listDoctor.map((item) => (
+              <div className="col-md-12">
+                <div className="responsive-circle">
+                  <img src={accountIcon} className="image-cover" alt="" onClick={() => imageClick({ item })} />
+                  <figcaption>{item.full_name}</figcaption>
+                </div>
+              </div>
+            ))}
+          </Carousel>
+          {chosen && <h3>Current doctor: <b>{nameDoctor}</b></h3>}
+        </div>
+      </div>
 
         {selectedDoctorID ? 
           <Scheduler 

@@ -56,7 +56,7 @@ export function Appointments(props) {
             let tempZoomLink = "";
 
             if(assignedDoctor){
-              axios.get(`http://localhost:3001/user/find/${assignedDoctor}`, { withCredentials: true })
+              axios.get(`https://ksu-tm.herokuapp.com/user/find/${assignedDoctor}`, { withCredentials: true })
               .then((response) => {
                 console.log(response)
                   setAssignedDocName(response.data[0].full_name)

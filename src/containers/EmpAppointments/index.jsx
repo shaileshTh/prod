@@ -138,7 +138,7 @@ export function EmpAppointments(props) {
                   // console.log(allAppointment[allAppointment.length - 1].title.props.children.props.children[1].props.children)
                   console.log(allAppointment[0].start)
                   axios
-                    .post("http://localhost:3001/send-sms", {  phone_number: "7706332309", text_content: `This is a reminder about your appointment ${upcomingAppt.title} scheduled for ${new Date(upcomingAppt.start)} with ${userFullName}.`})
+                    .post("https://ksu-tm.herokuapp.com/send-sms", {  phone_number: "7706332309", text_content: `This is a reminder about your appointment ${upcomingAppt.title} scheduled for ${new Date(upcomingAppt.start)} with ${userFullName}.`})
                     .then(function (response) {
                       alert("Patient notified"); 
                     })

@@ -132,7 +132,7 @@ const updateApptConfirm = ({updated})=>{
         )
     );
     axios
-        .post("http://localhost:3001/send-sms", {  phone_number: "7706332309", text_content: `Your appointment ${textTitle} sheduled for ${textDate} has been confirmed.`})
+        .post("https://ksu-tm.herokuapp.com/send-sms", {  phone_number: "7706332309", text_content: `Your appointment ${textTitle} sheduled for ${textDate} has been confirmed.`})
         .catch((err) => {
           console.log("CHP/index.jsx" + err);
         });
@@ -197,7 +197,7 @@ const textInput = useRef(null);
     event.preventDefault()
     const doctorName = textInput.current.value
     axios
-      .post("http://localhost:3001/doctorAppTime/searchDoctor", {
+      .post("https://ksu-tm.herokuapp.com/doctorAppTime/searchDoctor", {
         doctorName: doctorName,
       })
       .then((response) => {
